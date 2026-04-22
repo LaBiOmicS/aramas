@@ -4,6 +4,8 @@ import { CommandRegistry } from '../commands/registry';
 import type { CommandContext } from '../commands/types';
 import { QuestManager } from './QuestManager';
 
+export type PromptStyle = 'bash' | 'zsh' | 'minimal';
+
 export class TerminalEngine {
   private vfs: VFSManager;
   private registry: CommandRegistry;
@@ -13,6 +15,7 @@ export class TerminalEngine {
   private history: string[] = [];
   private historyIndex: number = -1;
   private onStateChange?: () => void;
+  private promptStyle: PromptStyle = 'bash';
 
   constructor(terminal: Terminal, onStateChange?: () => void) {
     this.terminal = terminal;
@@ -26,6 +29,9 @@ export class TerminalEngine {
     
     const savedQuestIndex = localStorage.getItem('quest_index');
     this.questManager = new QuestManager(savedQuestIndex ? parseInt(savedQuestIndex) : 0);
+
+    const savedStyle = localStorage.getItem('prompt_style') as PromptStyle;
+    if (savedStyle) this.promptStyle = savedStyle;
     
     this.terminal.onData(e => this.handleData(e));
     
@@ -58,11 +64,31 @@ export class TerminalEngine {
     return this.questManager;
   }
 
+  public getPromptStyle(): PromptStyle {
+    return this.promptStyle;
+  }
+
+  public setPromptStyle(style: PromptStyle) {
+    this.promptStyle = style;
+    this.saveState();
+  }
+
   private printPrompt() {
     const cwd = this.vfs.getCwd();
     const shortCwd = cwd.replace('/home/dayhoff', '~');
-    // Estilo Oh-My-Zsh
-    this.terminal.write(`\r\n\x1b[1;36m➜  \x1b[1;32m${shortCwd}\x1b[0m \x1b[1;34mgit:(\x1b[1;31mmain\x1b[1;34m)\x1b[0m `);
+    
+    switch (this.promptStyle) {
+      case 'zsh':
+        this.terminal.write(`\r\n\x1b[1;36m➜  \x1b[1;32m${shortCwd}\x1b[0m \x1b[1;34mgit:(\x1b[1;31mmain\x1b[1;34m)\x1b[0m `);
+        break;
+      case 'minimal':
+        this.terminal.write(`\r\n\x1b[1;32m${shortCwd} $\x1b[0m `);
+        break;
+      case 'bash':
+      default:
+        this.terminal.write(`\r\n\x1b[1;32mdayhoff@LaBiOmicS\x1b[0m:\x1b[1;34m${shortCwd}\x1b[0m$ `);
+        break;
+    }
   }
 
   private async handleData(data: string) {
@@ -90,6 +116,7 @@ export class TerminalEngine {
   private saveState() {
     localStorage.setItem('vfs_state', JSON.stringify(this.vfs.getState()));
     localStorage.setItem('quest_index', this.questManager.getCurrentIndex().toString());
+    localStorage.setItem('prompt_style', this.promptStyle);
     if (this.onStateChange) this.onStateChange();
   }
 
@@ -158,6 +185,18 @@ export class TerminalEngine {
         this.terminal.write(`\x1b[1;30mDica: ${q.hint}\x1b[0m\r\n`);
       } else {
         this.terminal.write('Nenhuma missão ativa no momento.\r\n');
+      }
+      return;
+    }
+
+    if (cmdName === 'tema') {
+      const style = args[0] as PromptStyle;
+      const validStyles: PromptStyle[] = ['bash', 'zsh', 'minimal'];
+      if (!style || !validStyles.includes(style)) {
+        this.terminal.write('Uso: tema [bash | zsh | minimal]\r\n');
+      } else {
+        this.setPromptStyle(style);
+        this.terminal.write(`Estilo alterado para '${style}'.\r\n`);
       }
       return;
     }
