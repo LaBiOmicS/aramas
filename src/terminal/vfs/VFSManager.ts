@@ -54,6 +54,10 @@ export class VFSManager {
     return JSON.parse(JSON.stringify(this.state));
   }
 
+  public getNodes(): Record<string, VFSNode> {
+    return this.state.nodes;
+  }
+
   public getCwd(): string {
     return this.state.cwd;
   }

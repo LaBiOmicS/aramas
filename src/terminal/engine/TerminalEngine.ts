@@ -12,9 +12,11 @@ export class TerminalEngine {
   private currentLine: string = '';
   private history: string[] = [];
   private historyIndex: number = -1;
+  private onStateChange?: () => void;
 
-  constructor(terminal: Terminal) {
+  constructor(terminal: Terminal, onStateChange?: () => void) {
     this.terminal = terminal;
+    this.onStateChange = onStateChange;
     
     // Carregar do localStorage
     const savedVFS = localStorage.getItem('vfs_state');
@@ -46,6 +48,14 @@ export class TerminalEngine {
     this.terminal.write('\x1b[1;34m#################################################################\x1b[0m\r\n');
     
     this.printPrompt();
+  }
+
+  public getVFS(): VFSManager {
+    return this.vfs;
+  }
+
+  public getQuestManager(): QuestManager {
+    return this.questManager;
   }
 
   private printPrompt() {
@@ -80,20 +90,23 @@ export class TerminalEngine {
   private saveState() {
     localStorage.setItem('vfs_state', JSON.stringify(this.vfs.getState()));
     localStorage.setItem('quest_index', this.questManager.getCurrentIndex().toString());
+    if (this.onStateChange) this.onStateChange();
   }
 
   private async handleEnter() {
     const line = this.currentLine.trim();
     this.terminal.write('\r\n');
     
+    let lastCmd = '';
     if (line) {
       this.history.push(line);
       this.historyIndex = this.history.length;
+      lastCmd = line.split(/\s+/)[0];
       await this.executeCommand(line);
     }
     
     // Verificar progresso da missão após cada comando
-    const completed = this.questManager.checkProgress(this.vfs);
+    const completed = this.questManager.checkProgress(this.vfs, lastCmd);
     if (completed) {
       this.terminal.write(`\r\n\x1b[1;32m✅ MISSÃO CONCLUÍDA: ${completed.title}\x1b[0m\r\n`);
       this.terminal.write(`${completed.completionMessage}\r\n`);
