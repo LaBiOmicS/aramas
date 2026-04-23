@@ -176,40 +176,6 @@ export const focaCommands: Command[] = [
     }
   },
   {
-    name: 'head',
-    description: 'Saída da primeira parte de arquivos',
-    execute: async (ctx) => {
-      const n = 10;
-      const path = ctx.args[0];
-      if (!path) return;
-      
-      const content = ctx.vfs.readFile(path, ctx.user);
-      if (content !== null && content !== 'Permissão negada') {
-        ctx.print(content.split('\n').slice(0, n).join('\n'));
-      } else {
-        ctx.printError(`head: ${path}: Permissão negada ou Arquivo não encontrado`);
-      }
-    }
-  },
-  {
-    name: 'tail',
-    description: 'Saída da última parte de arquivos',
-    execute: async (ctx) => {
-      const n = 10;
-      const path = ctx.args[0];
-      if (!path) return;
-      
-      const content = ctx.vfs.readFile(path, ctx.user);
-      if (content !== null && content !== 'Permissão negada') {
-        const lines = content.split('\n');
-        ctx.print(lines.slice(Math.max(0, lines.length - n)).join('\n'));
-      } else {
-        ctx.printError(`tail: ${path}: Permissão negada ou Arquivo não encontrado`);
-      }
-    }
-  },
-// ... (ps, top, free, uptime unchanged)
-  {
     name: 'ps',
     description: 'Relatório do status dos processos atuais',
     execute: async (ctx) => {
