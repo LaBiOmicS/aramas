@@ -3,7 +3,6 @@ import { Terminal as XTerm } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import '@xterm/xterm/css/xterm.css';
 import { TerminalEngine } from '../terminal/engine/TerminalEngine';
-import type { VFSNode } from '../terminal/vfs/types';
 
 const Terminal: React.FC = () => {
   const terminalRef = useRef<HTMLDivElement>(null);
