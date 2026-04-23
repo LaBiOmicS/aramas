@@ -7,23 +7,37 @@ import type { VFSNode } from '../terminal/vfs/types';
 
 const Terminal: React.FC = () => {
   const terminalRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const xtermRef = useRef<XTerm | null>(null);
+  const fitAddonRef = useRef<FitAddon | null>(null);
   const engineRef = useRef<TerminalEngine | null>(null);
+  
   const [vfsNodes, setVfsNodes] = useState<Record<string, VFSNode>>({});
   const [currentQuest, setCurrentQuest] = useState<{title: string, progress: string} | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (fitAddonRef.current) fitAddonRef.current.fit();
+    };
+
+    window.addEventListener('resize', handleResize);
+    
     if (!terminalRef.current) return;
 
     const xterm = new XTerm({
       cursorBlink: true,
       theme: {
-        background: '#1e1e1e',
+        background: '#151515',
         foreground: '#d4d4d4',
         cursor: '#ffffff',
-        selectionBackground: '#5c5c5c',
+        selectionBackground: '#333333',
       },
       fontFamily: '"Fira Code", Menlo, Monaco, "Courier New", monospace',
-      fontSize: 14,
+      fontSize: isMobile ? 12 : 14,
       allowProposedApi: true,
     });
 
@@ -32,6 +46,9 @@ const Terminal: React.FC = () => {
     
     xterm.open(terminalRef.current);
     fitAddon.fit();
+
+    xtermRef.current = xterm;
+    fitAddonRef.current = fitAddon;
 
     const updateUI = () => {
       if (engineRef.current) {
@@ -49,17 +66,21 @@ const Terminal: React.FC = () => {
     engineRef.current = new TerminalEngine(xterm, updateUI);
     updateUI();
 
-    const handleResize = () => {
-      fitAddon.fit();
-    };
-
-    window.addEventListener('resize', handleResize);
+    // Pequeno delay para garantir que o container terminou de animar
+    setTimeout(() => fitAddon.fit(), 100);
 
     return () => {
       window.removeEventListener('resize', handleResize);
       xterm.dispose();
     };
   }, []);
+
+  // Re-ajustar terminal quando a sidebar abre/fecha
+  useEffect(() => {
+    setTimeout(() => {
+      if (fitAddonRef.current) fitAddonRef.current.fit();
+    }, 300);
+  }, [sidebarOpen]);
 
   const renderFileTree = (path: string = '/') => {
     const node = vfsNodes[path];
@@ -68,8 +89,8 @@ const Terminal: React.FC = () => {
     if (node.type === 'directory') {
       return (
         <div key={path} style={{ marginLeft: '12px' }}>
-          <div style={{ color: '#cccccc', padding: '2px 0', display: 'flex', alignItems: 'center' }}>
-            <span style={{ marginRight: '5px', fontSize: '10px' }}>📁</span>
+          <div style={{ color: '#aaa', padding: '4px 0', display: 'flex', alignItems: 'center', fontSize: '13px' }}>
+            <span style={{ marginRight: '8px' }}>📁</span>
             {node.name || '/'}
           </div>
           {node.children.map(child => renderFileTree(path === '/' ? `/${child}` : `${path}/${child}`))}
@@ -78,79 +99,136 @@ const Terminal: React.FC = () => {
     }
 
     return (
-      <div key={path} style={{ marginLeft: '24px', color: '#888888', padding: '2px 0', fontSize: '0.9em' }}>
-        <span style={{ marginRight: '5px' }}>📄</span>
+      <div key={path} style={{ marginLeft: '26px', color: '#777', padding: '3px 0', fontSize: '12px' }}>
+        <span style={{ marginRight: '8px' }}>📄</span>
         {node.name}
       </div>
     );
   };
 
   return (
-    <div style={{ 
+    <div ref={containerRef} style={{ 
       display: 'flex', 
+      flexDirection: 'column',
       width: '100vw', 
       height: '100vh', 
-      backgroundColor: '#1e1e1e',
+      backgroundColor: '#0a0a0a',
       color: '#d4d4d4',
-      fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
+      overflow: 'hidden',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
     }}>
-      {/* Sidebar / Explorer */}
-      <div style={{ 
-        width: '260px', 
-        height: '100%', 
-        backgroundColor: '#252526', 
-        borderRight: '1px solid #333',
-        display: 'flex',
-        flexDirection: 'column'
+      {/* Header Responsivo */}
+      <header style={{ 
+        height: '50px', 
+        backgroundColor: '#1a1a1b', 
+        display: 'flex', 
+        alignItems: 'center', 
+        padding: '0 15px',
+        borderBottom: '1px solid #333',
+        zIndex: 100,
+        justifyContent: 'space-between'
       }}>
-        <div style={{ padding: '10px', fontSize: '11px', fontWeight: 'bold', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>
-          Explorador de Arquivos
-        </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '5px' }}>
-          {renderFileTree()}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <button 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#fff',
+              fontSize: '20px',
+              cursor: 'pointer',
+              marginRight: '15px',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            {sidebarOpen ? '✕' : '☰'}
+          </button>
+          <div style={{ fontWeight: 600, fontSize: '14px', letterSpacing: '0.5px' }}>
+            LABIOMICS <span style={{ color: '#007acc', fontWeight: 400 }}>TERMINAL</span>
+          </div>
         </div>
         
-        {/* Quest Status Area */}
-        {currentQuest && (
-          <div style={{ padding: '15px', backgroundColor: '#1e1e1e', borderTop: '1px solid #333' }}>
-            <div style={{ fontSize: '11px', color: '#007acc', fontWeight: 'bold', marginBottom: '5px' }}>
-              MISSÃO ATUAL ({currentQuest.progress})
-            </div>
-            <div style={{ fontSize: '13px', color: '#eee' }}>
-              {currentQuest.title}
-            </div>
+        {isMobile && currentQuest && (
+          <div style={{ fontSize: '11px', color: '#0dbc79' }}>
+            Missão: {currentQuest.progress}
           </div>
         )}
-      </div>
+      </header>
 
-      {/* Main Terminal Area */}
-      <div style={{ 
-        flex: 1, 
-        display: 'flex', 
-        flexDirection: 'column',
-        height: '100%' 
-      }}>
-        <div style={{ 
-          height: '35px', 
-          backgroundColor: '#2d2d2d', 
-          display: 'flex', 
-          alignItems: 'center', 
-          padding: '0 15px',
-          fontSize: '12px',
-          borderBottom: '1px solid #1e1e1e'
+      <div style={{ display: 'flex', flex: 1, position: 'relative', overflow: 'hidden' }}>
+        {/* Sidebar Lateral */}
+        <aside style={{ 
+          width: sidebarOpen ? (isMobile ? '100%' : '280px') : '0px', 
+          height: '100%', 
+          backgroundColor: '#111112', 
+          borderRight: sidebarOpen ? '1px solid #333' : 'none',
+          transition: 'width 0.3s ease',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          position: isMobile ? 'absolute' : 'relative',
+          zIndex: 90,
+          visibility: sidebarOpen ? 'visible' : 'hidden'
         }}>
-          <span style={{ color: '#0dbc79', marginRight: '5px' }}>●</span>
-          bash — dayhoff@LaBiOmicS
-        </div>
-        <div 
-          ref={terminalRef} 
-          style={{ 
-            flex: 1, 
-            width: '100%',
-            padding: '5px',
-            boxSizing: 'border-box'
-          }} 
-        />
+          <div style={{ padding: '20px 15px 10px', fontSize: '11px', fontWeight: 700, color: '#555', textTransform: 'uppercase' }}>
+            Explorador
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px' }}>
+            {renderFileTree()}
+          </div>
+          
+          {/* Missão no Sidebar */}
+          {currentQuest && (
+            <div style={{ 
+              padding: '20px', 
+              backgroundColor: '#1a1a1b', 
+              borderTop: '1px solid #333',
+              margin: '10px',
+              borderRadius: '8px'
+            }}>
+              <div style={{ fontSize: '10px', color: '#007acc', fontWeight: 800, marginBottom: '8px' }}>
+                OBJETIVO ATUAL {currentQuest.progress}
+              </div>
+              <div style={{ fontSize: '13px', color: '#eee', lineHeight: '1.4' }}>
+                {currentQuest.title}
+              </div>
+            </div>
+          )}
+        </aside>
+
+        {/* Área do Terminal */}
+        <main style={{ 
+          flex: 1, 
+          display: 'flex', 
+          flexDirection: 'column',
+          backgroundColor: '#151515',
+          position: 'relative'
+        }}>
+          {/* Tabs/Breadcrumb */}
+          <div style={{ 
+            height: '35px', 
+            backgroundColor: '#1a1a1b', 
+            display: 'flex', 
+            alignItems: 'center', 
+            padding: '0 15px',
+            fontSize: '11px',
+            color: '#888'
+          }}>
+            <span style={{ color: '#0dbc79', marginRight: '8px' }}>➜</span>
+            terminal — bash — dayhoff@LaBiOmicS
+          </div>
+
+          <div 
+            ref={terminalRef} 
+            style={{ 
+              flex: 1, 
+              width: '100%',
+              padding: '10px',
+              boxSizing: 'border-box'
+            }} 
+          />
+        </main>
       </div>
     </div>
   );
