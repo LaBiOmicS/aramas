@@ -48,6 +48,17 @@ export class VFSManager {
           modifiedAt: Date.now(),
           content: 'ATGCCCCGTAGTCGTA',
         },
+        '/home/dayhoff/environment.yml': {
+          name: 'environment.yml',
+          type: 'file',
+          parent: '/home/dayhoff',
+          permissions: 'rw-r--r--',
+          owner: 'dayhoff',
+          group: 'dayhoff',
+          createdAt: Date.now(),
+          modifiedAt: Date.now(),
+          content: 'name: bioinfo_toolset\nchannels:\n  - bioconda\n  - conda-forge\ndependencies:\n  - samtools\n  - bwa\n  - fastqc',
+        },
       },
       cwd: '/home/dayhoff',
     };
