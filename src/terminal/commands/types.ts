@@ -8,6 +8,7 @@ export interface CommandContext {
   print: (text: string) => void;
   printError: (text: string) => void;
   clear: () => void;
+  setEnv: (envName: string) => void;
 }
 
 export interface Command {

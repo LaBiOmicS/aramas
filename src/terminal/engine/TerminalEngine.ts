@@ -18,6 +18,7 @@ export class TerminalEngine {
   private promptStyle: PromptStyle = 'bash';
 
   private currentUser: string = 'dayhoff';
+  private currentEnv: string = '';
 
   constructor(terminal: Terminal, onStateChange?: () => void) {
     this.terminal = terminal;
@@ -37,6 +38,9 @@ export class TerminalEngine {
 
     const savedUser = localStorage.getItem('current_user');
     if (savedUser) this.currentUser = savedUser;
+
+    const savedEnv = localStorage.getItem('current_env');
+    if (savedEnv) this.currentEnv = savedEnv;
     
     this.terminal.onData(e => this.handleData(e));
     
@@ -85,19 +89,20 @@ export class TerminalEngine {
     const cwd = this.vfs.getCwd();
     const shortCwd = cwd.replace('/home/dayhoff', '~');
     const user = this.currentUser;
+    const envPrefix = this.currentEnv ? `(${this.currentEnv}) ` : '';
     const symbol = user === 'root' ? '#' : '$';
     
     switch (this.promptStyle) {
       case 'zsh':
-        this.terminal.write(`\r\n\x1b[1;36m➜  \x1b[1;32m${shortCwd}\x1b[0m \x1b[1;34mgit:(\x1b[1;31mmain\x1b[1;34m)\x1b[0m `);
+        this.terminal.write(`\r\n\x1b[1;36m➜  ${envPrefix}\x1b[1;32m${shortCwd}\x1b[0m \x1b[1;34mgit:(\x1b[1;31mmain\x1b[1;34m)\x1b[0m `);
         break;
       case 'minimal':
-        this.terminal.write(`\r\n\x1b[1;32m${shortCwd} ${symbol}\x1b[0m `);
+        this.terminal.write(`\r\n\x1b[1;32m${envPrefix}${shortCwd} ${symbol}\x1b[0m `);
         break;
       case 'bash':
       default:
         const userColor = user === 'root' ? '\x1b[1;31m' : '\x1b[1;32m';
-        this.terminal.write(`\r\n${userColor}${user}@LaBiOmicS\x1b[0m:\x1b[1;34m${shortCwd}\x1b[0m${symbol} `);
+        this.terminal.write(`\r\n${envPrefix}${userColor}${user}@LaBiOmicS\x1b[0m:\x1b[1;34m${shortCwd}\x1b[0m${symbol} `);
         break;
     }
   }
@@ -129,6 +134,7 @@ export class TerminalEngine {
     localStorage.setItem('quest_index', this.questManager.getCurrentIndex().toString());
     localStorage.setItem('prompt_style', this.promptStyle);
     localStorage.setItem('current_user', this.currentUser);
+    localStorage.setItem('current_env', this.currentEnv);
     if (this.onStateChange) this.onStateChange();
   }
 
@@ -215,6 +221,7 @@ export class TerminalEngine {
             vfs: this.vfs,
             args,
             user: effectiveUser,
+            setEnv: (name) => { this.currentEnv = name; },
             print: (text) => {
               output += text + '\n';
               if (i === commands.length - 1) {
@@ -268,6 +275,7 @@ export class TerminalEngine {
         vfs: this.vfs,
         args,
         user: effectiveUser,
+        setEnv: (name) => { this.currentEnv = name; },
         print: (text) => this.terminal.write(text.replace(/\n/g, '\r\n') + '\r\n'),
         printError: (text) => this.terminal.write(`\x1b[31mErro: ${text}\x1b[0m\r\n`),
         clear: () => this.terminal.clear(),
