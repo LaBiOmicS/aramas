@@ -3,12 +3,13 @@ import { basicCommands } from './basicCommands';
 import { focaCommands } from './focaCommands';
 import { bioCommands } from './bioCommands';
 import { extendedCommands } from './extendedCommands';
+import { packageManagerCommands } from './packageManagerCommands';
 
 export class CommandRegistry {
   private commands: Map<string, Command> = new Map();
 
   constructor() {
-    [...basicCommands, ...focaCommands, ...bioCommands, ...extendedCommands].forEach(cmd => {
+    [...basicCommands, ...focaCommands, ...bioCommands, ...extendedCommands, ...packageManagerCommands].forEach(cmd => {
       this.commands.set(cmd.name, cmd);
     });
 

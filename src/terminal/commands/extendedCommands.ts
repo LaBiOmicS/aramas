@@ -11,16 +11,29 @@ export const extendedCommands: Command[] = [
       ctx.print('Resolvendo host... OK');
       ctx.print('Conectando... OK');
       ctx.print('Requisição HTTP enviada, aguardando resposta... 200 OK');
-      ctx.print(`Salvando em: '${url.split('/').pop() || 'index.html'}'`);
+      ctx.print('Comprimento: 1024000 (1000K) [application/octet-stream]');
+      ctx.print(`Salvando em: '${url.split('/').pop() || 'index.html'}'\n`);
+      ctx.print(' 0% [                                     ] 0          --.-K/s');
+      await new Promise(r => setTimeout(r, 600));
+      ctx.print('100% [====================================>] 1,024,000  2.5MB/s   em 0.4s');
     }
   },
   {
     name: 'curl',
     description: 'Transfere dados de ou para um servidor',
     execute: async (ctx) => {
+      const showHeader = ctx.args.includes('-I') || ctx.args.includes('--head');
       const url = ctx.args.find(a => !a.startsWith('-'));
       if (!url) { ctx.printError('curl: use --help para mais informações'); return; }
-      ctx.print(`<html><body>Simulando resposta de ${url}</body></html>`);
+      
+      if (showHeader) {
+        ctx.print('HTTP/1.1 200 OK\nDate: Thu, 23 Apr 2026 12:00:00 GMT\nContent-Type: text/html; charset=UTF-8\nServer: gws');
+      } else {
+        ctx.print(`  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current`);
+        ctx.print(`                                 Dload  Upload   Total   Spent    Left  Speed`);
+        ctx.print(`100 1024k  100 1024k    0     0  2500k      0 --:--:-- --:--:-- --:--:-- 2500k`);
+        ctx.print(`<html><body>Simulando resposta de ${url}</body></html>`);
+      }
     }
   },
   {
