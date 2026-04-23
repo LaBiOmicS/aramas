@@ -59,6 +59,17 @@ export class VFSManager {
           modifiedAt: Date.now(),
           content: 'name: bioinfo_toolset\nchannels:\n  - bioconda\n  - conda-forge\ndependencies:\n  - samtools\n  - bwa\n  - fastqc',
         },
+        '/home/dayhoff/Dockerfile': {
+          name: 'Dockerfile',
+          type: 'file',
+          parent: '/home/dayhoff',
+          permissions: 'rw-r--r--',
+          owner: 'dayhoff',
+          group: 'dayhoff',
+          createdAt: Date.now(),
+          modifiedAt: Date.now(),
+          content: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y samtools\nCMD ["samtools"]',
+        },
       },
       cwd: '/home/dayhoff',
     };

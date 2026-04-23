@@ -155,16 +155,89 @@ export const packageManagerCommands: Command[] = [
     name: 'docker',
     description: 'Gerenciador de containers Docker',
     execute: async (ctx) => {
-      const cmd = ctx.args[0];
-      const img = ctx.args[1] || 'ubuntu';
-      if (cmd === 'run' || cmd === 'pull') {
-        ctx.print(`latest: Pulling from library/${img}\n\x1b[32mae13e: Pull complete\x1b[0m\n\x1b[32m31a2e: Pull complete\x1b[0m`);
-        ctx.print(`Digest: sha256:79a5...\nStatus: Downloaded newer image for ${img}:latest`);
-        if (cmd === 'run') ctx.print(`\nroot@${Math.random().toString(36).substring(7)}:/# `);
-      } else if (cmd === 'ps') {
-        ctx.print('CONTAINER ID   IMAGE     COMMAND   CREATED         STATUS         NAMES\n1a2b3c4d5e6f   nginx     "nginx"   2 min ago       Up 2 min       web-server');
+      const sub = ctx.args[0];
+      
+      const getImages = () => JSON.parse(localStorage.getItem('docker_images') || '["ubuntu:latest", "nginx:latest"]');
+      const addImage = (name: string) => {
+        const imgs = getImages();
+        if (!imgs.includes(name)) { imgs.push(name); localStorage.setItem('docker_images', JSON.stringify(imgs)); }
+      };
+      
+      const getContainers = () => JSON.parse(localStorage.getItem('docker_containers') || '[]');
+      const addContainer = (img: string, name: string) => {
+        const cnts = getContainers();
+        cnts.push({ id: Math.random().toString(36).substring(2, 14), image: img, name, status: 'Up 2 minutes' });
+        localStorage.setItem('docker_containers', JSON.stringify(cnts));
+      };
+
+      if (sub === 'pull') {
+        const img = ctx.args[1];
+        if (!img) { ctx.printError('docker pull: erro: imagem não especificada'); return; }
+        ctx.print(`Using default tag: latest\nlatest: Pulling from library/${img}`);
+        ctx.print(`\x1b[32m7b1a2: Pull complete\x1b[0m\n\x1b[32m5e44a: Pull complete\x1b[0m`);
+        ctx.print(`Digest: sha256:88a5...\nStatus: Downloaded newer image for ${img}:latest`);
+        addImage(img.includes(':') ? img : `${img}:latest`);
+      } else if (sub === 'run') {
+        const img = ctx.args.find(a => !a.startsWith('-') && a !== 'run');
+        if (!img) { ctx.printError('docker run: erro: imagem não especificada'); return; }
+        const it = ctx.args.includes('-it');
+        const name = ctx.args.includes('--name') ? ctx.args[ctx.args.indexOf('--name') + 1] : `brave_${Math.random().toString(36).substring(7)}`;
+        
+        if (!getImages().includes(img) && !getImages().includes(`${img}:latest`)) {
+          ctx.print(`Unable to find image '${img}' locally`);
+          ctx.print(`latest: Pulling from library/${img}... done`);
+          addImage(img.includes(':') ? img : `${img}:latest`);
+        }
+        
+        addContainer(img, name);
+        if (it) {
+          ctx.print(`\nroot@${Math.random().toString(36).substring(7)}:/# `);
+          ctx.print(`\x1b[1;30m(Simulando terminal interativo... digite 'exit' para sair)\x1b[0m`);
+        } else {
+          ctx.print(`Container started: ${name}`);
+        }
+      } else if (sub === 'build') {
+        const tagIdx = ctx.args.indexOf('-t');
+        const tag = tagIdx !== -1 ? ctx.args[tagIdx + 1] : 'latest';
+        const hasDockerfile = ctx.vfs.readFile('Dockerfile', ctx.user);
+        
+        if (hasDockerfile) {
+          ctx.print(`\x1b[1m[+] Building 5.2s (8/8) FINISHED\x1b[0m`);
+          ctx.print(` => [internal] load build definition from Dockerfile       0.1s`);
+          ctx.print(` => [internal] load .dockerignore                            0.0s`);
+          ctx.print(` => [1/3] FROM ubuntu:22.04                                  2.1s`);
+          ctx.print(` => [2/3] RUN apt-get update && apt-get install samtools     1.8s`);
+          ctx.print(` => [3/3] CMD ["samtools"]                                   0.1s`);
+          ctx.print(` => exporting to image                                       0.2s`);
+          ctx.print(` => naming to docker.io/library/${tag}                       0.0s`);
+          addImage(tag.includes(':') ? tag : `${tag}:latest`);
+        } else {
+          ctx.printError('docker build: erro: Dockerfile não encontrado no diretório atual');
+        }
+      } else if (sub === 'ps') {
+        const all = ctx.args.includes('-a');
+        ctx.print('CONTAINER ID   IMAGE          COMMAND    CREATED         STATUS         NAMES');
+        getContainers().forEach((c: any) => {
+          ctx.print(`${c.id.padEnd(14)} ${c.image.padEnd(14)} "bash"     2 minutes ago   ${c.status.padEnd(14)} ${c.name}`);
+        });
+      } else if (sub === 'images') {
+        ctx.print('REPOSITORY     TAG       IMAGE ID       CREATED       SIZE');
+        getImages().forEach((img: string) => {
+          const [repo, tag] = img.split(':');
+          ctx.print(`${(repo || 'ubuntu').padEnd(14)} ${(tag || 'latest').padEnd(9)} ba627c2e3661   2 weeks ago   72.8MB`);
+        });
+      } else if (sub === 'rm') {
+        const id = ctx.args[1];
+        const cnts = getContainers().filter((c: any) => c.id !== id && c.name !== id);
+        localStorage.setItem('docker_containers', JSON.stringify(cnts));
+        ctx.print(id);
+      } else if (sub === 'rmi') {
+        const id = ctx.args[1];
+        const imgs = getImages().filter((img: string) => img !== id);
+        localStorage.setItem('docker_images', JSON.stringify(imgs));
+        ctx.print(`Untagged: ${id}\nDeleted: sha256:ba627...`);
       } else {
-        ctx.print('Usage: docker [pull|run|ps|images]');
+        ctx.print('Usage: docker [pull|run|ps|images|build|rm|rmi]');
       }
     }
   },
