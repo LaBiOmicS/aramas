@@ -126,11 +126,12 @@ const Terminal: React.FC = () => {
       ]
     },
     {
-      title: 'Bioinformática (LaBiOmicS)',
+      title: '5. Computação Científica (Bioinfo)',
       commands: [
-        { name: 'bio-count', desc: 'Conta a frequência de bases (A, T, C, G)', example: 'bio-count seq.fasta' },
-        { name: 'bio-rev-comp', desc: 'Gera o complemento reverso de DNA', example: 'bio-rev-comp ATGC' },
-        { name: 'fasta-view', desc: 'Visualiza arquivos FASTA coloridos', example: 'fasta-view seq.fasta' },
+        { name: 'conda', desc: 'Gerenciador de ambientes virtuais', example: 'conda create -n bio' },
+        { name: 'mamba', desc: 'Instalador ultra-rápido de pacotes', example: 'mamba install bwa' },
+        { name: 'samtools', desc: 'Manipulação de arquivos genômicos', example: 'samtools view' },
+        { name: 'fasta-view', desc: 'Visualização colorida de sequências', example: 'fasta-view seq.fasta' },
       ]
     }
   ];
@@ -174,7 +175,7 @@ const Terminal: React.FC = () => {
             {sidebarOpen ? '✕' : '☰'}
           </button>
           <div style={{ fontWeight: 600, fontSize: '14px', letterSpacing: '0.5px' }}>
-            LABIOMICS <span style={{ color: '#007acc', fontWeight: 400 }}>TERMINAL</span>
+            TERMINAL <span style={{ color: '#007acc', fontWeight: 400 }}>EDUCACIONAL</span>
           </div>
         </div>
         
@@ -202,7 +203,7 @@ const Terminal: React.FC = () => {
         }}>
           {/* Perfil do Pesquisador Dashboard */}
           <div style={{ padding: '20px 15px', backgroundColor: '#1a1a1b', borderBottom: '1px solid #333' }}>
-            <div style={{ fontSize: '10px', color: '#888', fontWeight: 700, marginBottom: '5px', textTransform: 'uppercase' }}>Seu Perfil</div>
+            <div style={{ fontSize: '10px', color: '#888', fontWeight: 700, marginBottom: '5px', textTransform: 'uppercase' }}>Perfil do Estudante</div>
             <div style={{ fontSize: '15px', color: '#fff', fontWeight: 600, marginBottom: '2px' }}>{userProfile.rank}</div>
             <div style={{ fontSize: '11px', color: '#007acc', marginBottom: '10px' }}>{userProfile.xp} XP acumulados</div>
             

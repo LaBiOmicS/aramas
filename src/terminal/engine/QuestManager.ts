@@ -1,6 +1,6 @@
 import { VFSManager } from '../vfs/VFSManager';
 
-export type QuestCategory = 'Fundamentos' | 'Administração' | 'Dados & Pipes' | 'Bioinformática';
+export type QuestCategory = 'Sistemas Operacionais' | 'Manipulação de Dados' | 'Computação Científica';
 
 export interface Achievement {
   id: string;
@@ -22,106 +22,121 @@ export interface Quest {
 }
 
 export const RANKS = [
-  { name: 'Estagiário(a) de Bioinfo', minXp: 0 },
-  { name: 'Analista Júnior', minXp: 500 },
-  { name: 'Analista Pleno', minXp: 1200 },
-  { name: 'Pesquisador(a) Sênior', minXp: 2500 },
-  { name: 'Arquiteto(a) Genômico', minXp: 5000 }
+  { name: 'Novato(a)', minXp: 0 },
+  { name: 'Iniciante', minXp: 500 },
+  { name: 'Intermediário(a)', minXp: 1200 },
+  { name: 'Avançado(a)', minXp: 2500 },
+  { name: 'Especialista', minXp: 5000 }
 ];
 
 export const quests: Quest[] = [
-  // --- FUNDAMENTOS ---
+  // --- MÓDULO 1: SISTEMAS OPERACIONAIS ---
   {
-    id: 'intro-1',
-    category: 'Fundamentos',
-    title: 'Ponto de Partida',
-    description: 'Localize sua posição atual no servidor.',
-    hint: 'Use \'pwd\'.',
+    id: 'so-1',
+    category: 'Sistemas Operacionais',
+    title: 'Explorador de Arquivos',
+    description: 'Comece pelo básico. Liste os arquivos do seu diretório atual para ver o que há por aqui.',
+    hint: 'Use o comando \'ls\'.',
     xp: 100,
-    checkCondition: (_, cmd) => cmd === 'pwd',
-    completionMessage: 'Você identificou seu diretório home (/home/dayhoff).',
+    checkCondition: (_, cmd) => cmd === 'ls',
+    completionMessage: 'Você deu o primeiro passo na navegação de sistemas!',
   },
   {
-    id: 'ls-1',
-    category: 'Fundamentos',
-    title: 'Visão Periférica',
-    description: 'Liste os arquivos, incluindo os ocultos, para ver a configuração do ambiente.',
+    id: 'so-2',
+    category: 'Sistemas Operacionais',
+    title: 'Hierarquia Oculta',
+    description: 'Muitos arquivos importantes no Linux começam com ponto (.). Liste todos os arquivos, incluindo os ocultos.',
     hint: 'Tente \'ls -la\'.',
     xp: 150,
     checkCondition: (_, __, line) => line.includes('ls') && line.includes('-a'),
-    completionMessage: 'Excelente. Você descobriu arquivos ocultos como .bashrc!',
+    completionMessage: 'Parabéns! Você descobriu arquivos de configuração como o .bashrc.',
   },
-  
-  // --- ADMINISTRAÇÃO ---
   {
-    id: 'sudo-1',
-    category: 'Administração',
-    title: 'Acesso Restrito',
-    description: 'Tente visualizar o conteúdo da pasta /root e use privilégios se necessário.',
+    id: 'so-3',
+    category: 'Sistemas Operacionais',
+    title: 'Acesso Administrativo',
+    description: 'Tente visualizar o conteúdo do diretório \'/root\'. Você precisará elevar seus privilégios.',
     hint: 'Use \'sudo ls /root\'.',
-    xp: 300,
-    checkCondition: (_, cmd, line) => cmd === 'sudo' && line.includes('ls /root'),
-    completionMessage: 'Privilégios de superusuário adquiridos!',
-  },
-  {
-    id: 'chmod-1',
-    category: 'Administração',
-    title: 'Cofre de Dados',
-    description: 'Crie um arquivo \'protegido.txt\' e mude a permissão para que ninguém (nem você) possa ler.',
-    hint: 'Use \'touch protegido.txt\' e \'chmod 000 protegido.txt\'.',
     xp: 250,
-    checkCondition: (vfs) => {
-      const node = vfs.getNode('/home/dayhoff/protegido.txt');
-      return !!node && node.permissions === '---------';
-    },
-    completionMessage: 'Permissões alteradas com sucesso. Segurança em primeiro lugar!',
+    checkCondition: (_, cmd, line) => cmd === 'sudo' && line.includes('ls /root'),
+    completionMessage: 'Poder de root concedido! Cuidado ao usar este comando.',
   },
 
-  // --- DADOS & PIPES ---
+  // --- MÓDULO 2: MANIPULAÇÃO DE DADOS ---
   {
-    id: 'pipe-1',
-    category: 'Dados & Pipes',
-    title: 'Fluxo de Trabalho',
-    description: 'Conte quantas sequências existem no arquivo \'sequencia.fasta\' usando grep e wc em um único comando.',
-    hint: 'Tente \'grep ">" sequencia.fasta | wc -l\'.',
+    id: 'data-1',
+    category: 'Manipulação de Dados',
+    title: 'Coleta de Dados',
+    description: 'Baixe um conjunto de dados simulado da web para análise.',
+    hint: 'Use \'wget http://exemplo.com/dados.csv\'.',
+    xp: 200,
+    checkCondition: (_, cmd) => cmd === 'wget' || cmd === 'curl',
+    completionMessage: 'Download concluído! Agora os dados estão prontos para o processamento.',
+  },
+  {
+    id: 'data-2',
+    category: 'Manipulação de Dados',
+    title: 'Descompactação Progressiva',
+    description: 'Muitos datasets vêm compactados. Crie um arquivo .tar simulado e depois extraia-o.',
+    hint: 'Use \'tar -cvf backup.tar projetos\' e depois \'tar -xvf backup.tar\'.',
+    xp: 300,
+    checkCondition: (_, cmd) => cmd === 'tar',
+    completionMessage: 'Domínio de empacotamento e compressão alcançado!',
+  },
+  {
+    id: 'data-3',
+    category: 'Manipulação de Dados',
+    title: 'Minerador de Texto',
+    description: 'Filtre linhas específicas de um arquivo de log e conte as ocorrências.',
+    hint: 'Tente algo como \'grep "Erro" log.txt | wc -l\'.',
     xp: 400,
     checkCondition: (_, __, line) => line.includes('|') && line.includes('grep') && line.includes('wc'),
-    completionMessage: 'Você dominou o encadeamento de comandos (Pipes)!',
+    completionMessage: 'Mestre dos Pipes! O encadeamento de comandos é o segredo da produtividade.',
   },
 
-  // --- BIOINFORMATICA ---
+  // --- MÓDULO 3: COMPUTAÇÃO CIENTÍFICA ---
   {
-    id: 'bio-env-1',
-    category: 'Bioinformática',
-    title: 'Isolamento Biológico',
-    description: 'Crie um ambiente virtual chamado \'genomica\' usando o mamba para seus experimentos.',
-    hint: 'Tente \'mamba create -n genomica\'.',
-    xp: 300,
+    id: 'science-1',
+    category: 'Computação Científica',
+    title: 'O Laboratório Virtual',
+    description: 'Na ciência, a reprodutibilidade é tudo. Crie um ambiente isolado chamado \'projeto_beta\' usando mamba.',
+    hint: 'Tente \'mamba create -n projeto_beta\'.',
+    xp: 400,
     checkCondition: () => {
       const envs = JSON.parse(localStorage.getItem('terminal_envs') || '[]');
-      return envs.includes('genomica');
+      return envs.includes('projeto_beta');
     },
-    completionMessage: 'Ambiente de análise criado!',
+    completionMessage: 'Ambiente criado! Você agora pode gerenciar dependências sem conflitos.',
   },
   {
-    id: 'bio-tool-1',
-    category: 'Bioinformática',
-    title: 'Arsenal Técnico',
-    description: 'Instale o \'samtools\' no ambiente \'genomica\' e verifique a versão.',
-    hint: 'Ative o ambiente primeiro e use \'mamba install samtools\'.',
+    id: 'science-2',
+    category: 'Computação Científica',
+    title: 'Ativação de Ferramentas',
+    description: 'Ative seu novo ambiente para começar a instalar ferramentas específicas.',
+    hint: 'Use \'conda activate projeto_beta\'.',
+    xp: 300,
+    checkCondition: () => localStorage.getItem('current_env') === 'projeto_beta',
+    completionMessage: 'Prompt alterado! Você está operando de forma isolada e segura.',
+  },
+  {
+    id: 'science-3',
+    category: 'Computação Científica',
+    title: 'Análise Genômica Real',
+    description: 'Instale a ferramenta \'samtools\' no ambiente e visualize os dados do arquivo fasta.',
+    hint: 'Use \'mamba install samtools\' e depois explore o comando \'fasta-view\'.',
     xp: 500,
     checkCondition: (_, cmd) => {
-      const pkgs = JSON.parse(localStorage.getItem('pkgs_genomica') || '[]');
-      return cmd === 'samtools' || (cmd === 'mamba' && pkgs.includes('samtools'));
+      const pkgs = JSON.parse(localStorage.getItem('pkgs_projeto_beta') || '[]');
+      return (cmd === 'mamba' && pkgs.includes('samtools')) || cmd === 'fasta-view';
     },
-    completionMessage: 'Ferramenta pronta para uso no ambiente correto!',
+    completionMessage: 'Jornada concluída! Você domina do SO básico à Computação Científica avançada.',
   }
 ];
 
 export const achievements: Achievement[] = [
-  { id: 'root_power', name: 'Soberano do Sistema', description: 'Usou sudo pela primeira vez', icon: '👑', condition: (s) => s.sudoCount > 0 },
-  { id: 'pipe_master', name: 'Mestre dos Encanos', description: 'Usou um pipe complexo', icon: '🧪', condition: (s) => s.pipeCount > 0 },
-  { id: 'env_architect', name: 'Arquiteto de Ambientes', description: 'Criou 3 ou mais ambientes virtuais', icon: '🏗️', condition: (s) => s.envCount >= 3 }
+  { id: 'admin_badge', name: 'Administrador(a)', description: 'Usou comandos sudo com sucesso', icon: '⚡', condition: (s) => s.sudoCount > 0 },
+  { id: 'pipe_badge', name: 'Mestre dos Pipes', description: 'Executou filtros complexos com pipes', icon: '🔗', condition: (s) => s.pipeCount >= 3 },
+  { id: 'env_badge', name: 'Cientista de Ambientes', description: 'Gerenciou múltiplos ambientes virtuais', icon: '🧪', condition: (s) => s.envCount >= 2 }
 ];
 
 export class QuestManager {
@@ -141,7 +156,6 @@ export class QuestManager {
       this.totalXp = state.xp || 0;
       this.stats = state.stats || this.stats;
     }
-    // Sincronizar envCount
     const envs = JSON.parse(localStorage.getItem('terminal_envs') || '["base"]');
     this.stats.envCount = envs.length;
   }
@@ -175,7 +189,6 @@ export class QuestManager {
   public checkProgress(vfs: VFSManager, lastCommand: string, fullLine: string): {quest: Quest, rankUp: boolean} | null {
     const current = this.getCurrentQuest();
     
-    // Atualizar stats
     if (fullLine.startsWith('sudo')) this.stats.sudoCount++;
     if (fullLine.includes('|')) this.stats.pipeCount++;
     const envs = JSON.parse(localStorage.getItem('terminal_envs') || '["base"]');

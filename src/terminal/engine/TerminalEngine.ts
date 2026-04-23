@@ -55,16 +55,14 @@ export class TerminalEngine {
     const banner = [
       '#'.repeat(totalWidth),
       '# ' + ' '.repeat(totalWidth - 4) + ' #',
-      formatLine('BEM-VINDO AO TERMINAL LABIOMICS - VERSÃO 2.0', '1;33'),
+      formatLine('AMBIENTE DE ENSINO MULTIDISCIPLINAR - LABIOMICS', '1;33'),
       '# ' + ' '.repeat(totalWidth - 4) + ' #',
-      formatLine('Este ambiente simulado agora suporta:', '0'),
-      formatLine('- Sistema de Permissões Realista (chmod/chown)', '1;32'),
-      formatLine('- Execução com Superusuário (sudo)', '1;32'),
-      formatLine('- Redirecionamento e Pipes (|)', '1;32'),
-      formatLine('- Gerenciadores (Conda, Mamba, Docker, Pixi)', '1;32'),
+      formatLine('Módulo 1: Fundamentos de Sistemas Operacionais', '1;32'),
+      formatLine('Módulo 2: Ferramentas de Manipulação de Dados', '1;32'),
+      formatLine('Módulo 3: Computação Científica e Ambientes', '1;32'),
       '# ' + ' '.repeat(totalWidth - 4) + ' #',
-      formatLine("Digite 'missao' para ver seu objetivo atual.", '1;36'),
-      formatLine("Digite 'ajuda' para listar os comandos disponíveis.", '1;36'),
+      formatLine("Digite 'missao' para iniciar sua jornada.", '1;36'),
+      formatLine("Digite 'ajuda' para listar os comandos.", '1;36'),
       '# ' + ' '.repeat(totalWidth - 4) + ' #',
       '#'.repeat(totalWidth)
     ];
