@@ -3,7 +3,8 @@ import { Terminal as XTerm } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import '@xterm/xterm/css/xterm.css';
 import { TerminalEngine } from '../terminal/engine/TerminalEngine';
-import { RANKS, Achievement } from '../terminal/engine/QuestManager';
+import { RANKS } from '../terminal/engine/QuestManager';
+import type { Achievement } from '../terminal/engine/QuestManager';
 
 const Terminal: React.FC = () => {
   const terminalRef = useRef<HTMLDivElement>(null);

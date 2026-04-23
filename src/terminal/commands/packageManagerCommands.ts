@@ -218,7 +218,6 @@ export const packageManagerCommands: Command[] = [
           ctx.printError('docker build: erro: Dockerfile não encontrado no diretório atual');
         }
       } else if (sub === 'ps') {
-        const all = ctx.args.includes('-a');
         ctx.print('CONTAINER ID   IMAGE          COMMAND    CREATED         STATUS         NAMES');
         getContainers().forEach((c: any) => {
           ctx.print(`${c.id.padEnd(14)} ${c.image.padEnd(14)} "bash"     2 minutes ago   ${c.status.padEnd(14)} ${c.name}`);

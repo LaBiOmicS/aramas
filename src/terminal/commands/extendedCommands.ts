@@ -63,7 +63,6 @@ export const extendedCommands: Command[] = [
     name: 'zip',
     description: 'Empacota e comprime (arquiva) arquivos',
     execute: async (ctx) => {
-      const recursive = ctx.args.includes('-r');
       const target = ctx.args.find(a => !a.startsWith('-'));
       if (!target) { ctx.printError('zip error: Nothing to do!'); return; }
       ctx.print(`  adding: ${target} (deflated 15%)`);

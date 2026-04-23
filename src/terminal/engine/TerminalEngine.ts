@@ -137,7 +137,6 @@ export class TerminalEngine {
 
   private saveState() {
     localStorage.setItem('vfs_state', JSON.stringify(this.vfs.getState()));
-    localStorage.setItem('quest_index', this.questManager.getCurrentIndex().toString());
     localStorage.setItem('prompt_style', this.promptStyle);
     localStorage.setItem('current_user', this.currentUser);
     localStorage.setItem('current_env', this.currentEnv);
