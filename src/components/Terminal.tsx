@@ -3,6 +3,7 @@ import { Terminal as XTerm } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import '@xterm/xterm/css/xterm.css';
 import { TerminalEngine } from '../terminal/engine/TerminalEngine';
+import { RANKS, Achievement } from '../terminal/engine/QuestManager';
 
 const Terminal: React.FC = () => {
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -11,7 +12,8 @@ const Terminal: React.FC = () => {
   const fitAddonRef = useRef<FitAddon | null>(null);
   const engineRef = useRef<TerminalEngine | null>(null);
   
-  const [currentQuest, setCurrentQuest] = useState<{title: string, progress: string} | null>(null);
+  const [currentQuest, setCurrentQuest] = useState<{title: string, progress: string, category: string, xp: number} | null>(null);
+  const [userProfile, setUserProfile] = useState<{rank: string, xp: number, achievements: Achievement[]}>({ rank: RANKS[0].name, xp: 0, achievements: [] });
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -53,10 +55,15 @@ const Terminal: React.FC = () => {
         const qm = engineRef.current.getQuestManager();
         const q = qm.getCurrentQuest();
         if (q) {
-          setCurrentQuest({ title: q.title, progress: qm.getProgress() });
+          setCurrentQuest({ title: q.title, progress: qm.getProgress(), category: q.category, xp: q.xp });
         } else {
           setCurrentQuest(null);
         }
+        setUserProfile({
+          rank: qm.getRank().name,
+          xp: qm.getXP(),
+          achievements: qm.getAchievements()
+        });
       }
     };
 
@@ -193,6 +200,31 @@ const Terminal: React.FC = () => {
           zIndex: 90,
           visibility: sidebarOpen ? 'visible' : 'hidden'
         }}>
+          {/* Perfil do Pesquisador Dashboard */}
+          <div style={{ padding: '20px 15px', backgroundColor: '#1a1a1b', borderBottom: '1px solid #333' }}>
+            <div style={{ fontSize: '10px', color: '#888', fontWeight: 700, marginBottom: '5px', textTransform: 'uppercase' }}>Seu Perfil</div>
+            <div style={{ fontSize: '15px', color: '#fff', fontWeight: 600, marginBottom: '2px' }}>{userProfile.rank}</div>
+            <div style={{ fontSize: '11px', color: '#007acc', marginBottom: '10px' }}>{userProfile.xp} XP acumulados</div>
+            
+            {/* Conquistas (Badges) */}
+            <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginTop: '10px' }}>
+              {userProfile.achievements.map(a => (
+                <span key={a.id} title={`${a.name}: ${a.description}`} style={{ 
+                  fontSize: '18px', 
+                  backgroundColor: '#222', 
+                  padding: '5px', 
+                  borderRadius: '4px',
+                  cursor: 'help'
+                }}>
+                  {a.icon}
+                </span>
+              ))}
+              {userProfile.achievements.length === 0 && (
+                <div style={{ fontSize: '10px', color: '#444', fontStyle: 'italic' }}>Nenhuma conquista ainda...</div>
+              )}
+            </div>
+          </div>
+
           <div style={{ padding: '20px 15px 10px', fontSize: '11px', fontWeight: 700, color: '#007acc', textTransform: 'uppercase', letterSpacing: '1px' }}>
             Guia de Comandos
           </div>
@@ -249,11 +281,14 @@ const Terminal: React.FC = () => {
               boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
             }}>
               <div style={{ fontSize: '10px', color: '#0dbc79', fontWeight: 800, marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                <span>MISSÃO ATUAL</span>
+                <span>{currentQuest.category.toUpperCase()}</span>
                 <span>{currentQuest.progress}</span>
               </div>
               <div style={{ fontSize: '13px', color: '#eee', lineHeight: '1.4', fontWeight: 500 }}>
                 {currentQuest.title}
+              </div>
+              <div style={{ fontSize: '10px', color: '#007acc', marginTop: '5px', fontWeight: 600 }}>
+                Recompensa: +{currentQuest.xp} XP
               </div>
             </div>
           )}

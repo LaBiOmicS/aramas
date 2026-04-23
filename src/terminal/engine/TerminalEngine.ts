@@ -159,17 +159,23 @@ export class TerminalEngine {
     }
     
     // Verificar progresso da missão após cada comando
-    const completed = this.questManager.checkProgress(this.vfs, lastCmd);
-    if (completed) {
-      this.terminal.write(`\r\n\x1b[1;32m✅ MISSÃO CONCLUÍDA: ${completed.title}\x1b[0m\r\n`);
-      this.terminal.write(`${completed.completionMessage}\r\n`);
+    const result = this.questManager.checkProgress(this.vfs, lastCmd, line);
+    if (result) {
+      const { quest, rankUp } = result;
+      this.terminal.write(`\r\n\x1b[1;32m✅ MISSÃO CONCLUÍDA: ${quest.title} (+${quest.xp} XP)\x1b[0m\r\n`);
+      this.terminal.write(`${quest.completionMessage}\r\n`);
       
+      if (rankUp) {
+        const newRank = this.questManager.getRank();
+        this.terminal.write(`\r\n\x1b[1;33m🎊 PARABÉNS! Você foi promovido(a) a: ${newRank.name}!\x1b[0m\r\n`);
+      }
+
       const next = this.questManager.getCurrentQuest();
       if (next) {
-        this.terminal.write(`\r\n\x1b[1;33m🚀 PRÓXIMA MISSÃO: ${next.title}\x1b[0m\r\n`);
+        this.terminal.write(`\r\n\x1b[1;34m🚀 PRÓXIMA MISSÃO [${next.category}]: ${next.title}\x1b[0m\r\n`);
         this.terminal.write(`${next.description}\r\n`);
       } else {
-        this.terminal.write(`\r\n\x1b[1;35m🏆 PARABÉNS! Você completou todas as missões!\x1b[0m\r\n`);
+        this.terminal.write(`\r\n\x1b[1;35m🏆 PARABÉNS! Você atingiu o ápice da carreira em Bioinformática!\x1b[0m\r\n`);
       }
     }
     
