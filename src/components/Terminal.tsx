@@ -12,7 +12,6 @@ const Terminal: React.FC = () => {
   const fitAddonRef = useRef<FitAddon | null>(null);
   const engineRef = useRef<TerminalEngine | null>(null);
   
-  const [vfsNodes, setVfsNodes] = useState<Record<string, VFSNode>>({});
   const [currentQuest, setCurrentQuest] = useState<{title: string, progress: string} | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -52,7 +51,6 @@ const Terminal: React.FC = () => {
 
     const updateUI = () => {
       if (engineRef.current) {
-        setVfsNodes({...engineRef.current.getVFS().getNodes()});
         const qm = engineRef.current.getQuestManager();
         const q = qm.getCurrentQuest();
         if (q) {
