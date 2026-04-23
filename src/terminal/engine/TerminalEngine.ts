@@ -44,21 +44,29 @@ export class TerminalEngine {
     
     this.terminal.onData(e => this.handleData(e));
     
-    // Mensagem de Boas-vindas (MOTD) centralizada e alinhada
+    // Mensagem de Boas-vindas (MOTD) dinâmica para garantir alinhamento perfeito
+    const totalWidth = 65;
+    const formatLine = (text: string, colorCode: string = '0') => {
+      const internalWidth = totalWidth - 4; // Desconta '# ' e ' #'
+      const padding = ' '.repeat(Math.max(0, internalWidth - text.length));
+      return `# \x1b[${colorCode}m${text}\x1b[0m${padding} #`;
+    };
+
     const banner = [
-      '#################################################################',
-      '#                                                               #',
-      '#  \x1b[1;33mBEM-VINDO AO TERMINAL LABIOMICS - VERSÃO 2.0\x1b[1;34m                 #',
-      '#                                                               #',
-      '#  \x1b[0mEste ambiente simulado agora suporta:                        \x1b[1;34m#',
-      '#  \x1b[1;32m- Sistema de Permissões Realista (chmod/chown)               \x1b[1;34m#',
-      '#  \x1b[1;32m- Execução com Superusuário (sudo)                           \x1b[1;34m#',
-      '#  \x1b[1;32m- Redirecionamento e Pipes (|)                               \x1b[1;34m#',
-      '#                                                               #',
-      '#  \x1b[0mDigite \x1b[1;36mmissao\x1b[0m para ver seu objetivo atual.                   \x1b[1;34m#',
-      '#  \x1b[0mDigite \x1b[1;36majuda\x1b[0m para listar os comandos disponíveis.            \x1b[1;34m#',
-      '#                                                               #',
-      '#################################################################'
+      '#'.repeat(totalWidth),
+      '# ' + ' '.repeat(totalWidth - 4) + ' #',
+      formatLine('BEM-VINDO AO TERMINAL LABIOMICS - VERSÃO 2.0', '1;33'),
+      '# ' + ' '.repeat(totalWidth - 4) + ' #',
+      formatLine('Este ambiente simulado agora suporta:', '0'),
+      formatLine('- Sistema de Permissões Realista (chmod/chown)', '1;32'),
+      formatLine('- Execução com Superusuário (sudo)', '1;32'),
+      formatLine('- Redirecionamento e Pipes (|)', '1;32'),
+      formatLine('- Gerenciadores (Conda, Mamba, Docker, Pixi)', '1;32'),
+      '# ' + ' '.repeat(totalWidth - 4) + ' #',
+      formatLine("Digite 'missao' para ver seu objetivo atual.", '1;36'),
+      formatLine("Digite 'ajuda' para listar os comandos disponíveis.", '1;36'),
+      '# ' + ' '.repeat(totalWidth - 4) + ' #',
+      '#'.repeat(totalWidth)
     ];
     
     this.terminal.write('\x1b[1;34m');
