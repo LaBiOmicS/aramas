@@ -82,29 +82,45 @@ const Terminal: React.FC = () => {
     }, 300);
   }, [sidebarOpen]);
 
-  const renderFileTree = (path: string = '/') => {
-    const node = vfsNodes[path];
-    if (!node) return null;
-
-    if (node.type === 'directory') {
-      return (
-        <div key={path} style={{ marginLeft: '12px' }}>
-          <div style={{ color: '#aaa', padding: '4px 0', display: 'flex', alignItems: 'center', fontSize: '13px' }}>
-            <span style={{ marginRight: '8px' }}>📁</span>
-            {node.name || '/'}
-          </div>
-          {node.children.map(child => renderFileTree(path === '/' ? `/${child}` : `${path}/${child}`))}
-        </div>
-      );
+  const commandGroups = [
+    {
+      title: 'Navegação',
+      commands: [
+        { name: 'pwd', desc: 'Mostra onde você está agora', example: 'pwd' },
+        { name: 'ls', desc: 'Lista arquivos e pastas', example: 'ls -l' },
+        { name: 'cd', desc: 'Entra em uma pasta', example: 'cd nome_da_pasta' },
+        { name: 'cd ..', desc: 'Volta para a pasta anterior', example: 'cd ..' },
+      ]
+    },
+    {
+      title: 'Arquivos e Pastas',
+      commands: [
+        { name: 'mkdir', desc: 'Cria uma nova pasta', example: 'mkdir nova_pasta' },
+        { name: 'touch', desc: 'Cria um arquivo vazio', example: 'touch nota.txt' },
+        { name: 'cp', desc: 'Copia um arquivo', example: 'cp arq1.txt copia.txt' },
+        { name: 'mv', desc: 'Move ou renomeia um arquivo', example: 'mv arq.txt pasta/' },
+        { name: 'rm', desc: 'Remove um arquivo', example: 'rm arquivo.txt' },
+        { name: 'rm -r', desc: 'Remove uma pasta e tudo nela', example: 'rm -r pasta/' },
+      ]
+    },
+    {
+      title: 'Texto e Conteúdo',
+      commands: [
+        { name: 'cat', desc: 'Mostra o conteúdo de um arquivo', example: 'cat nota.txt' },
+        { name: 'echo', desc: 'Escreve texto ou cria arquivos', example: 'echo "Oi" > arq.txt' },
+        { name: 'grep', desc: 'Busca texto dentro de arquivos', example: 'grep "erro" log.txt' },
+        { name: 'head/tail', desc: 'Vê o início ou fim de um arquivo', example: 'head arq.txt' },
+      ]
+    },
+    {
+      title: 'Rede e Sistema',
+      commands: [
+        { name: 'apt', desc: 'Instala pacotes (simulado)', example: 'apt install git' },
+        { name: 'ping', desc: 'Testa conexão com um site', example: 'ping google.com' },
+        { name: 'top/ps', desc: 'Mostra processos rodando', example: 'top' },
+      ]
     }
-
-    return (
-      <div key={path} style={{ marginLeft: '26px', color: '#777', padding: '3px 0', fontSize: '12px' }}>
-        <span style={{ marginRight: '8px' }}>📄</span>
-        {node.name}
-      </div>
-    );
-  };
+  ];
 
   return (
     <div ref={containerRef} style={{ 
@@ -151,15 +167,15 @@ const Terminal: React.FC = () => {
         
         {isMobile && currentQuest && (
           <div style={{ fontSize: '11px', color: '#0dbc79' }}>
-            Missão: {currentQuest.progress}
+            {currentQuest.progress}
           </div>
         )}
       </header>
 
       <div style={{ display: 'flex', flex: 1, position: 'relative', overflow: 'hidden' }}>
-        {/* Sidebar Lateral */}
+        {/* Sidebar Lateral - Guia de Comandos */}
         <aside style={{ 
-          width: sidebarOpen ? (isMobile ? '100%' : '280px') : '0px', 
+          width: sidebarOpen ? (isMobile ? '100%' : '300px') : '0px', 
           height: '100%', 
           backgroundColor: '#111112', 
           borderRight: sidebarOpen ? '1px solid #333' : 'none',
@@ -171,11 +187,25 @@ const Terminal: React.FC = () => {
           zIndex: 90,
           visibility: sidebarOpen ? 'visible' : 'hidden'
         }}>
-          <div style={{ padding: '20px 15px 10px', fontSize: '11px', fontWeight: 700, color: '#555', textTransform: 'uppercase' }}>
-            Explorador
+          <div style={{ padding: '20px 15px 10px', fontSize: '11px', fontWeight: 700, color: '#007acc', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            Guia de Comandos (Cola)
           </div>
-          <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px' }}>
-            {renderFileTree()}
+          
+          <div style={{ flex: 1, overflowY: 'auto', padding: '0 15px 20px' }}>
+            {commandGroups.map((group, i) => (
+              <div key={i} style={{ marginBottom: '20px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: '#888', marginBottom: '8px', borderBottom: '1px solid #222', paddingBottom: '3px' }}>
+                  {group.title}
+                </div>
+                {group.commands.map((cmd, j) => (
+                  <div key={j} style={{ marginBottom: '10px' }}>
+                    <div style={{ fontSize: '13px', color: '#eee', fontFamily: 'monospace', fontWeight: 'bold' }}>{cmd.name}</div>
+                    <div style={{ fontSize: '11px', color: '#777', marginTop: '2px' }}>{cmd.desc}</div>
+                    <div style={{ fontSize: '10px', color: '#444', fontStyle: 'italic', marginTop: '1px' }}>Ex: {cmd.example}</div>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
           
           {/* Missão no Sidebar */}
@@ -185,12 +215,14 @@ const Terminal: React.FC = () => {
               backgroundColor: '#1a1a1b', 
               borderTop: '1px solid #333',
               margin: '10px',
-              borderRadius: '8px'
+              borderRadius: '8px',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
             }}>
-              <div style={{ fontSize: '10px', color: '#007acc', fontWeight: 800, marginBottom: '8px' }}>
-                OBJETIVO ATUAL {currentQuest.progress}
+              <div style={{ fontSize: '10px', color: '#0dbc79', fontWeight: 800, marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
+                <span>MISSÃO ATUAL</span>
+                <span>{currentQuest.progress}</span>
               </div>
-              <div style={{ fontSize: '13px', color: '#eee', lineHeight: '1.4' }}>
+              <div style={{ fontSize: '13px', color: '#eee', lineHeight: '1.4', fontWeight: 500 }}>
                 {currentQuest.title}
               </div>
             </div>
@@ -213,7 +245,8 @@ const Terminal: React.FC = () => {
             alignItems: 'center', 
             padding: '0 15px',
             fontSize: '11px',
-            color: '#888'
+            color: '#888',
+            borderBottom: '1px solid #111'
           }}>
             <span style={{ color: '#0dbc79', marginRight: '8px' }}>➜</span>
             terminal — bash — dayhoff@LaBiOmicS
