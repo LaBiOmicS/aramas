@@ -16,7 +16,7 @@ const Terminal: React.FC = () => {
   const [userProfile, setUserProfile] = useState<{rank: string, xp: number, achievements: Achievement[]}>({ rank: RANKS[0].name, xp: 0, achievements: [] });
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [expandedGroups, setExpandedGroups] = useState<Record<number, boolean>>({ 0: true });
+  const [expandedGroups, setExpandedGroups] = useState<Record<number, boolean>>({});
 
   const toggleGroup = (index: number) => {
     setExpandedGroups(prev => ({ ...prev, [index]: !prev[index] }));

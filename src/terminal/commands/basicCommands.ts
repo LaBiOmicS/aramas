@@ -33,11 +33,24 @@ export const basicCommands: Command[] = [
             if (node) {
               const type = node.type === 'directory' ? 'd' : '-';
               const date = new Date(node.modifiedAt).toLocaleDateString('pt-BR', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-              ctx.print(`${type}${node.permissions} 1 ${node.owner} ${node.group} 4096 ${date} ${name}`);
+              const color = node.type === 'directory' ? '\x1b[1;34m' : '';
+              const reset = color ? '\x1b[0m' : '';
+              ctx.print(`${type}${node.permissions} 1 ${node.owner} ${node.group} 4096 ${date} ${color}${name}${reset}`);
             }
           }
         } else {
-          ctx.print(filtered.join('  '));
+          const coloredNames = filtered.map(name => {
+            let node;
+            if (name === '.') node = ctx.vfs.getNode(pathArg);
+            else if (name === '..') node = ctx.vfs.getNode(ctx.vfs.resolvePath(pathArg + '/..'));
+            else node = ctx.vfs.getNode(ctx.vfs.resolvePath(pathArg + '/' + name));
+
+            if (node && node.type === 'directory') {
+              return `\x1b[1;34m${name}\x1b[0m`;
+            }
+            return name;
+          });
+          ctx.print(coloredNames.join('  '));
         }
       } else {
         ctx.printError(`ls: não foi possível acessar '${pathArg}': Permissão negada ou Diretório não encontrado`);
@@ -122,7 +135,7 @@ export const basicCommands: Command[] = [
 
       for (const arg of ctx.args) {
         if (arg.startsWith('-')) {
-          if (arg.includes('r')) recursive = true;
+          if (arg.includes('r') || arg.includes('R')) recursive = true;
           if (arg.includes('f')) force = true;
           if (arg.includes('v')) verbose = true;
         } else {
@@ -136,6 +149,12 @@ export const basicCommands: Command[] = [
       }
 
       for (const path of paths) {
+        const node = ctx.vfs.getNode(path);
+        if (node && node.type === 'directory' && !recursive) {
+          ctx.printError(`rm: não foi possível remover '${path}': É um diretório`);
+          continue;
+        }
+
         if (ctx.vfs.rm(path, ctx.user, recursive)) {
           if (verbose) ctx.print(`removido '${path}'`);
         } else {
