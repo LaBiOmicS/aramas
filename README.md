@@ -1,73 +1,32 @@
-# React + TypeScript + Vite
+# ARAMAS v1.0.0
+### Ambiente Remoto para o Aprendizado e Manipulação de Arquivos e Sistemas
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+O **ARAMAS** é um recurso pedagógico gamificado desenvolvido para o ensino de Linux e Bioinformática. O projeto simula um ambiente de terminal real, permitindo que estudantes pratiquem comandos, gerenciem ambientes e executem ferramentas de bioinformática enquanto progridem em uma jornada de aprendizado baseada em missões e XP.
 
-Currently, two official plugins are available:
+## 🚀 Acesso
+Acesse a ferramenta online: [https://labiomics.github.io/aramas/](https://labiomics.github.io/aramas/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🧬 Características
+- **Terminal Gamificado:** Ganhe XP, conquiste insígnias e suba de rank (de Novato a Mestre).
+- **Módulos de Aprendizado:**
+  - Sistemas Operacionais (Básico ao Admin).
+  - Manipulação de Dados (Pipes, Filtros e Fluxos).
+  - Computação Científica (Bioinformática, Containers e HPC).
+- **Ferramentas Simuladas:** Samtools, BWA, Snakemake, Docker, Singularity e muito mais.
+- **VFS (Virtual File System):** Sistema de arquivos persistente em memória com suporte a permissões.
 
-## React Compiler
+## 🛠️ Tecnologias
+- React + TypeScript
+- XTerm.js (Emulação de Terminal)
+- React Router (Navegação)
+- Vite (Build Tool)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 👤 Coordenação
+**Prof. Dr. Fabiano B. Menegidio**
 
-## Expanding the ESLint configuration
+## 🧪 Laboratório
+**LaBiOmicS** - Laboratório de Bioinformática e Ciências Ômicas
+**Universidade de Mogi das Cruzes (UMC)**
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 📄 Licença
+Este projeto está sob a licença MIT.
