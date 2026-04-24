@@ -91,6 +91,12 @@ export class TerminalEngine {
     this.saveState();
   }
 
+  public async triggerCommand(line: string) {
+    this.terminal.write(line + '\r\n');
+    await this.executeCommand(line);
+    this.printPrompt();
+  }
+
   private printPrompt() {
     const cwd = this.vfs.getCwd();
     const shortCwd = cwd.replace('/home/dayhoff', '~');
@@ -259,33 +265,36 @@ export class TerminalEngine {
     const args = parts.slice(1);
 
     if (cmdName === 'missao' || cmdName === 'quest') {
-      if (args.includes('-h') || args.includes('--help')) {
-        this.terminal.write(`\x1b[1;32mAJUDA: missao\x1b[0m\r\n`);
-        this.terminal.write(`Exibe informações detalhadas sobre sua jornada, XP e missão atual.\r\n`);
-        this.terminal.write(`\r\n\x1b[1;33mUSO:\x1b[0m\r\nmissao\r\n`);
-        return;
-      }
-
       const q = this.questManager.getCurrentQuest();
       const rank = this.questManager.getRank();
       const xp = this.questManager.getXP();
       const percent = this.questManager.getProgressPercentage();
       const progressBar = '█'.repeat(Math.floor(percent / 5)) + '░'.repeat(20 - Math.floor(percent / 5));
 
-      this.terminal.write(`\r\n\x1b[1;35m╔════════════════════ JORNADA DO CONHECIMENTO ════════════════════╗\x1b[0m\r\n`);
-      this.terminal.write(`║ \x1b[1mPerfil:\x1b[0m ${this.currentUser.padEnd(10)} \x1b[1mRank:\x1b[0m ${rank.name.padEnd(25)} ║\r\n`);
-      this.terminal.write(`║ \x1b[1mProgresso:\x1b[0m [${progressBar}] ${percent}% (${xp} XP) ║\r\n`);
-      this.terminal.write(`╟─────────────────────────────────────────────────────────────────╢\r\n`);
+      const width = 65;
+      const drawLine = (content: string, color: string = '') => {
+        // Remove códigos ANSI para calcular o comprimento visível
+        const visibleLength = content.replace(/\x1b\[[0-9;]*m/g, '').replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, ' ').length;
+        const padding = ' '.repeat(Math.max(0, width - visibleLength));
+        return `║ ${color}${content}\x1b[0m${padding} ║\r\n`;
+      };
+
+      this.terminal.write(`\r\n\x1b[1;35m╔${'═'.repeat(width + 2)}╗\x1b[0m\r\n`);
+      this.terminal.write(drawLine(`\x1b[1mPERFIL:\x1b[0m ${this.currentUser} | \x1b[1mRANK:\x1b[0m ${rank.name}`, '\x1b[1m'));
+      this.terminal.write(drawLine(`\x1b[1mPROGRESSO:\x1b[0m [${progressBar}] ${percent}% (${xp} XP)`));
+      this.terminal.write(`\x1b[1;35m╟${'─'.repeat(width + 2)}╢\x1b[0m\r\n`);
       
       if (q) {
-        this.terminal.write(`║ \x1b[1;33m🎯 MISSÃO ATUAL:\x1b[0m ${q.title.padEnd(46)} ║\r\n`);
-        this.terminal.write(`║ \x1b[1;34m📂 Categoria:\x1b[0m ${q.category.padEnd(49)} ║\r\n`);
-        this.terminal.write(`║ \x1b[1mObjetivo:\x1b[0m ${q.description.padEnd(52)} ║\r\n`);
-        this.terminal.write(`║ \x1b[1;30m💡 Dica: ${q.hint.padEnd(54)}\x1b[0m ║\r\n`);
+        this.terminal.write(drawLine(`🎯 \x1b[1;33mMISSÃO:\x1b[0m ${q.title}`));
+        this.terminal.write(drawLine(`📂 \x1b[1;34mCATEGORIA:\x1b[0m ${q.category}`));
+        this.terminal.write(drawLine(`✨ \x1b[1mOBJETIVO:\x1b[0m ${q.description}`));
+        this.terminal.write(drawLine(`💡 \x1b[1;30mDICA: ${q.hint}`));
       } else {
-        this.terminal.write(`║ \x1b[1;32m🏆 VOCÊ CONCLUIU TODAS AS MISSÕES! PARABÉNS!                  \x1b[0m ║\r\n`);
+        this.terminal.write(drawLine(`\x1b[1;32m🏆 JORNADA CONCLUÍDA! VOCÊ É UM MESTRE! \x1b[0m`));
       }
-      this.terminal.write(`╚═════════════════════════════════════════════════════════════════╝\r\n`);
+      this.terminal.write(`\x1b[1;35m╟${'─'.repeat(width + 2)}╢\x1b[0m\r\n`);
+      this.terminal.write(drawLine(`\x1b[1;30mPara recomeçar sua jornada, digite 'reset'\x1b[0m`));
+      this.terminal.write(`\x1b[1;35m╚${'═'.repeat(width + 2)}╝\x1b[0m\r\n`);
       return;
     }
 

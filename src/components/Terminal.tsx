@@ -322,6 +322,29 @@ const Terminal: React.FC = () => {
           </div>
 
           <div style={{ padding: '15px', backgroundColor: '#0a0a0b', borderTop: '1px solid #333' }}>
+            <button 
+              onClick={() => {
+                if (engineRef.current) {
+                  engineRef.current.triggerCommand('reset');
+                }
+              }}
+              style={{
+                width: '100%',
+                padding: '8px',
+                backgroundColor: 'transparent',
+                border: '1px solid #444',
+                color: '#666',
+                fontSize: '10px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                marginBottom: '10px',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.borderColor = '#cc0000'; e.currentTarget.style.color = '#cc0000'; }}
+              onMouseOut={(e) => { e.currentTarget.style.borderColor = '#444'; e.currentTarget.style.color = '#666'; }}
+            >
+              🔄 REINICIAR PROGRESSO
+            </button>
             <div style={{ fontSize: '10px', color: '#666', lineHeight: '1.4' }}>
               <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>ARAMAS v1.0</div>
               Desenvolvido pelo <span style={{ color: '#007acc' }}>LaBiOmicS - UMC</span>
