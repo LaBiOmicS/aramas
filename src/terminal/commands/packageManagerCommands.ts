@@ -86,7 +86,6 @@ export const packageManagerCommands: Command[] = [
       if (sub === 'shell' && ctx.args[1] === 'init') {
         ctx.print(`Enabling micromamba shell support in ~/.bashrc...\nSuccessfully initialized.`);
       } else {
-        // Reutiliza lógica do mamba/conda
         const mamba = packageManagerCommands.find(c => c.name === 'mamba');
         if (mamba) await mamba.execute(ctx);
       }
@@ -128,6 +127,92 @@ export const packageManagerCommands: Command[] = [
         ctx.print(`Global Python version set to ${ctx.args[1] || '3.10.4'}`);
       } else {
         ctx.print('Usage: pyenv [install|versions|global|local|which]');
+      }
+    }
+  },
+  {
+    name: 'apt',
+    description: 'Gerenciador de pacotes do Debian/Ubuntu',
+    help: 'apt [COMANDO] [PACOTE]\n\nInterface avançada para gerenciamento de pacotes do sistema.\n\nComandos:\n  update      Atualiza a lista de repositórios\n  install     Instala pacotes e suas dependências\n  remove      Remove pacotes\n  search      Busca pacotes na base de dados\n  list --upgradable Lista pacotes que podem ser atualizados',
+    execute: async (ctx) => {
+      const sub = ctx.args[0];
+      const pkg = ctx.args[1];
+      if (sub === 'update') {
+        ctx.print('Atingido:1 http://br.archive.ubuntu.com/ubuntu jammy InRelease');
+        ctx.print('Obter:2 http://br.archive.ubuntu.com/ubuntu jammy-updates InRelease [119 kB]');
+        ctx.print('Obter:3 http://br.archive.ubuntu.com/ubuntu jammy-backports InRelease [108 kB]');
+        ctx.print('Obter:4 http://security.ubuntu.com/ubuntu jammy-security InRelease [110 kB]');
+        ctx.print('Lendo listas de pacotes... 0%');
+        await new Promise(r => setTimeout(r, 400));
+        ctx.print('Lendo listas de pacotes... 100% [Pronto]');
+      } else if (sub === 'install') {
+        if (!pkg) { ctx.printError('apt install: erro: pacote não especificado'); return; }
+        ctx.print('Lendo listas de pacotes... Pronto\nConstruindo árvore de dependências... Pronto');
+        ctx.print(`Os seguintes pacotes ADICIONAIS serão instalados:\n  lib${pkg}-dev common-${pkg}`);
+        ctx.print(`Os seguintes NOVOS pacotes serão instalados:\n  ${pkg} lib${pkg}-dev common-${pkg}`);
+        ctx.print('0 atualizados, 3 novos instalados, 0 a serem removidos.');
+        ctx.print('É preciso baixar 1.250 kB de arquivos.');
+        ctx.print('Depois desta operação, 4.500 kB de espaço em disco rígido serão utilizados.');
+        ctx.print('Obter:1 http://br.archive.ubuntu.com/ubuntu jammy/main ... [OK]');
+        ctx.print(`Configurando ${pkg} (1.2.3-1ubuntu1) ...`);
+        ctx.print(`\x1b[32mProgresso: [########################################] 100%\x1b[0m`);
+        installPkg('system', pkg);
+      } else if (sub === 'search') {
+        ctx.print(`Sorting... Done\nFull Text Search... Done\n${pkg || 'samtools'}/jammy 1.16.1-1 amd64\n  Tools for manipulating next-generation sequencing data`);
+      } else {
+        ctx.print('Uso: apt [install|remove|update|search|list]');
+      }
+    }
+  },
+  {
+    name: 'make',
+    description: 'Utilitário para gerenciar a compilação de programas',
+    help: 'make [ALVO]\n\nExecuta comandos especificados em um Makefile para compilar código ou automatizar tarefas.',
+    execute: async (ctx) => {
+      const makefile = ctx.vfs.readFile('Makefile', ctx.user);
+      if (makefile) {
+        const target = ctx.args[0] || 'all';
+        ctx.print(`gcc -Wall -O2 -c main.c -o main.o`);
+        ctx.print(`gcc -Wall -O2 -c utils.c -o utils.o`);
+        ctx.print(`gcc main.o utils.o -o program`);
+        ctx.print(`\x1b[1;32mMake: Alvo '${target}' concluído com sucesso.\x1b[0m`);
+      } else {
+        ctx.printError('make: *** Nenhum alvo especificado e nenhum makefile encontrado. Pare.');
+      }
+    }
+  },
+  {
+    name: 'snakemake',
+    description: 'Sistema de gerenciamento de fluxos de trabalho (Bioinformática)',
+    help: 'snakemake [OPÇÕES]\n\nExecuta pipelines definidos em um Snakefile.\n\nOpções:\n  -n, --dry-run   Exibe o que seria executado sem rodar nada\n  -c, --cores     Especifica o número de núcleos (ex: -c 4)\n  --list-rules    Lista todas as regras do Snakefile',
+    execute: async (ctx) => {
+      const dryRun = ctx.args.includes('-n') || ctx.args.includes('--dry-run');
+      const snakefile = ctx.vfs.readFile('Snakefile', ctx.user);
+      
+      if (!snakefile && !ctx.args.includes('--list-rules')) {
+        ctx.printError('Error: Snakefile not found in current directory.');
+        return;
+      }
+
+      ctx.print(`\x1b[1mBuilding DAG of jobs...\x1b[0m`);
+      ctx.print(`Job counts:\n\tcount\tjobs\n\t1\tall\n\t1\tmap_reads\n\t1\tsort_bam\n\t1\tcall_variants\n\t4\ttotal\n`);
+      
+      if (dryRun) {
+        ctx.print(`\x1b[33m[Dry-run] Rule map_reads:\x1b[0m\n\tinput: data/sample.fastq\n\toutput: results/mapped.bam`);
+        ctx.print(`\x1b[33m[Dry-run] Rule sort_bam:\x1b[0m\n\tinput: results/mapped.bam\n\toutput: results/sorted.bam`);
+        ctx.print(`\n\x1b[1;32mThis was a dry-run. No jobs were executed.\x1b[0m`);
+      } else {
+        ctx.print(`\x1b[1;34mRule map_reads:\x1b[0m`);
+        ctx.print(`\tinput: data/sample.fastq\n\toutput: results/mapped.bam\n\tjobid: 1`);
+        await new Promise(r => setTimeout(r, 600));
+        ctx.print(`\x1b[32mFinished job 1.\x1b[0m\n1 of 4 steps (25%) done`);
+        
+        ctx.print(`\n\x1b[1;34mRule sort_bam:\x1b[0m`);
+        ctx.print(`\tinput: results/mapped.bam\n\toutput: results/sorted.bam\n\tjobid: 2`);
+        await new Promise(r => setTimeout(r, 400));
+        ctx.print(`\x1b[32mFinished job 2.\x1b[0m\n2 of 4 steps (50%) done`);
+        
+        ctx.print(`\n\x1b[1;32mComplete!\x1b[0m`);
       }
     }
   },
