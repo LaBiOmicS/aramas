@@ -596,6 +596,14 @@ export class QuestManager {
     return Math.round((this.currentQuestIndex / quests.length) * 100);
   }
 
+  public getCurrentQuest(): Quest | null {
+    return this.currentQuestIndex < quests.length ? quests[this.currentQuestIndex] : null;
+  }
+
+  public getAchievements(): Achievement[] {
+    return achievements.filter(a => a.condition(this.stats));
+  }
+
   public reset() {
     this.currentQuestIndex = 0;
     this.totalXp = 0;
