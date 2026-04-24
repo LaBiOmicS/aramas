@@ -13,7 +13,7 @@ const Terminal: React.FC = () => {
   const engineRef = useRef<TerminalEngine | null>(null);
   
   const [currentQuest, setCurrentQuest] = useState<{title: string, progress: string, category: string, xp: number} | null>(null);
-  const [userProfile, setUserProfile] = useState<{rank: string, xp: number, achievements: Achievement[]}>({ rank: RANKS[0].name, xp: 0, achievements: [] });
+  const [userProfile, setUserProfile] = useState<{rank: string, xp: number, achievements: Achievement[], percent: number}>({ rank: RANKS[0].name, xp: 0, achievements: [], percent: 0 });
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [expandedGroups, setExpandedGroups] = useState<Record<number, boolean>>({});
@@ -62,14 +62,15 @@ const Terminal: React.FC = () => {
         const qm = engineRef.current.getQuestManager();
         const q = qm.getCurrentQuest();
         if (q) {
-          setCurrentQuest({ title: q.title, progress: qm.getProgress(), category: q.category, xp: q.xp });
+          setCurrentQuest({ title: q.title, progress: `${qm.getProgressPercentage()}%`, category: q.category, xp: q.xp });
         } else {
           setCurrentQuest(null);
         }
         setUserProfile({
           rank: qm.getRank().name,
           xp: qm.getXP(),
-          achievements: qm.getAchievements()
+          achievements: qm.getAchievements(),
+          percent: qm.getProgressPercentage()
         });
       }
     };
@@ -237,10 +238,45 @@ const Terminal: React.FC = () => {
           visibility: sidebarOpen ? 'visible' : 'hidden'
         }}>
           <div style={{ padding: '20px 15px', backgroundColor: '#1a1a1b', borderBottom: '1px solid #333' }}>
-            <div style={{ fontSize: '10px', color: '#888', fontWeight: 700, marginBottom: '5px', textTransform: 'uppercase' }}>Perfil do Estudante</div>
-            <div style={{ fontSize: '15px', color: '#fff', fontWeight: 600, marginBottom: '2px' }}>{userProfile.rank}</div>
-            <div style={{ fontSize: '11px', color: '#007acc' }}>{userProfile.xp} XP acumulados</div>
+            <div style={{ fontSize: '10px', color: '#888', fontWeight: 700, marginBottom: '8px', textTransform: 'uppercase' }}>Perfil do Estudante</div>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+              <div style={{ 
+                width: '40px', 
+                height: '40px', 
+                backgroundColor: '#007acc', 
+                borderRadius: '50%', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                marginRight: '12px',
+                fontSize: '18px'
+              }}>
+                🎓
+              </div>
+              <div>
+                <div style={{ fontSize: '14px', color: '#fff', fontWeight: 600 }}>{userProfile.rank}</div>
+                <div style={{ fontSize: '11px', color: '#007acc' }}>{userProfile.xp} XP acumulados</div>
+              </div>
+            </div>
+            
+            <div style={{ marginTop: '15px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#aaa', marginBottom: '4px' }}>
+                <span>Progresso Geral</span>
+                <span>{userProfile.percent}%</span>
+              </div>
+              <div style={{ width: '100%', height: '6px', backgroundColor: '#333', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ width: `${userProfile.percent}%`, height: '100%', backgroundColor: '#0dbc79', transition: 'width 0.5s ease' }}></div>
+              </div>
+            </div>
           </div>
+
+          {currentQuest && (
+            <div style={{ padding: '15px', backgroundColor: '#161617', borderBottom: '1px solid #333' }}>
+              <div style={{ fontSize: '10px', color: '#0dbc79', fontWeight: 700, marginBottom: '5px', textTransform: 'uppercase' }}>Missão Atual</div>
+              <div style={{ fontSize: '13px', color: '#eee', fontWeight: 600, marginBottom: '2px' }}>{currentQuest.title}</div>
+              <div style={{ fontSize: '11px', color: '#888', fontStyle: 'italic' }}>{currentQuest.category}</div>
+            </div>
+          )}
 
           <div style={{ padding: '15px 15px 5px', fontSize: '11px', fontWeight: 700, color: '#007acc', textTransform: 'uppercase', letterSpacing: '1px' }}>
             Guia de Comandos

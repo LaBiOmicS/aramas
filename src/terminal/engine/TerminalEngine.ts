@@ -261,18 +261,57 @@ export class TerminalEngine {
     if (cmdName === 'missao' || cmdName === 'quest') {
       if (args.includes('-h') || args.includes('--help')) {
         this.terminal.write(`\x1b[1;32mAJUDA: missao\x1b[0m\r\n`);
-        this.terminal.write(`Mostra o objetivo atual da sua jornada de aprendizado.\r\n`);
+        this.terminal.write(`Exibe informações detalhadas sobre sua jornada, XP e missão atual.\r\n`);
         this.terminal.write(`\r\n\x1b[1;33mUSO:\x1b[0m\r\nmissao\r\n`);
         return;
       }
+
       const q = this.questManager.getCurrentQuest();
+      const rank = this.questManager.getRank();
+      const xp = this.questManager.getXP();
+      const percent = this.questManager.getProgressPercentage();
+      const progressBar = '█'.repeat(Math.floor(percent / 5)) + '░'.repeat(20 - Math.floor(percent / 5));
+
+      this.terminal.write(`\r\n\x1b[1;35m╔════════════════════ JORNADA DO CONHECIMENTO ════════════════════╗\x1b[0m\r\n`);
+      this.terminal.write(`║ \x1b[1mPerfil:\x1b[0m ${this.currentUser.padEnd(10)} \x1b[1mRank:\x1b[0m ${rank.name.padEnd(25)} ║\r\n`);
+      this.terminal.write(`║ \x1b[1mProgresso:\x1b[0m [${progressBar}] ${percent}% (${xp} XP) ║\r\n`);
+      this.terminal.write(`╟─────────────────────────────────────────────────────────────────╢\r\n`);
+      
       if (q) {
-        this.terminal.write(`\x1b[1;33m🎯 MISSÃO ATUAL: ${q.title}\x1b[0m\r\n`);
-        this.terminal.write(`${q.description}\r\n`);
-        this.terminal.write(`\x1b[1;30mDica: ${q.hint}\x1b[0m\r\n`);
+        this.terminal.write(`║ \x1b[1;33m🎯 MISSÃO ATUAL:\x1b[0m ${q.title.padEnd(46)} ║\r\n`);
+        this.terminal.write(`║ \x1b[1;34m📂 Categoria:\x1b[0m ${q.category.padEnd(49)} ║\r\n`);
+        this.terminal.write(`║ \x1b[1mObjetivo:\x1b[0m ${q.description.padEnd(52)} ║\r\n`);
+        this.terminal.write(`║ \x1b[1;30m💡 Dica: ${q.hint.padEnd(54)}\x1b[0m ║\r\n`);
       } else {
-        this.terminal.write('Nenhuma missão ativa no momento.\r\n');
+        this.terminal.write(`║ \x1b[1;32m🏆 VOCÊ CONCLUIU TODAS AS MISSÕES! PARABÉNS!                  \x1b[0m ║\r\n`);
       }
+      this.terminal.write(`╚═════════════════════════════════════════════════════════════════╝\r\n`);
+      return;
+    }
+
+    if (cmdName === 'reset') {
+      this.terminal.write('\x1b[1;31mATENÇÃO: Isso apagará todo o seu progresso e arquivos criados!\x1b[0m\r\n');
+      this.terminal.write('Você tem certeza que deseja resetar? (s/n): ');
+      
+      const handleReset = (data: string) => {
+        const input = data.toLowerCase();
+        if (input === 's') {
+          this.questManager.reset();
+          localStorage.clear(); // Limpa tudo
+          this.terminal.write('\r\n\x1b[1;32mSistema resetado com sucesso. Reiniciando...\x1b[0m\r\n');
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          this.terminal.write('\r\nOperação cancelada.\r\n');
+          this.printPrompt();
+        }
+        this.terminal.onData(e => this.handleData(e)); // Restaura o handler original
+      };
+
+      // Temporariamente muda o handler para ler a confirmação
+      const sub = this.terminal.onData(e => {
+        sub.dispose();
+        handleReset(e);
+      });
       return;
     }
 

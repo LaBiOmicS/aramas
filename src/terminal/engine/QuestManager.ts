@@ -592,20 +592,19 @@ export class QuestManager {
 
   public getXP() { return this.totalXp; }
   
-  public getProgress(): string {
-    return `${this.currentQuestIndex}/${quests.length}`;
+  public getProgressPercentage(): number {
+    return Math.round((this.currentQuestIndex / quests.length) * 100);
   }
 
-  public getCurrentQuest(): Quest | null {
-    return this.currentQuestIndex < quests.length ? quests[this.currentQuestIndex] : null;
-  }
-
-  public getCurrentIndex(): number {
-    return this.currentQuestIndex;
-  }
-
-  public getAchievements(): Achievement[] {
-    return achievements.filter(a => a.condition(this.stats));
+  public reset() {
+    this.currentQuestIndex = 0;
+    this.totalXp = 0;
+    this.stats = { sudoCount: 0, pipeCount: 0, envCount: 1 };
+    localStorage.removeItem('quest_manager_state');
+    localStorage.removeItem('terminal_envs');
+    localStorage.removeItem('current_env');
+    localStorage.removeItem('vfs_state');
+    this.saveState();
   }
 
   public checkProgress(vfs: VFSManager, lastCommand: string, fullLine: string): {quest: Quest, rankUp: boolean} | null {
