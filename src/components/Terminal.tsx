@@ -324,26 +324,31 @@ const Terminal: React.FC = () => {
           <div style={{ padding: '15px', backgroundColor: '#0a0a0b', borderTop: '1px solid #333' }}>
             <button 
               onClick={() => {
-                if (engineRef.current) {
+                if (engineRef.current && window.confirm('Você tem certeza que deseja resetar todo o seu progresso?')) {
                   engineRef.current.triggerCommand('reset');
                 }
               }}
               style={{
                 width: '100%',
-                padding: '8px',
-                backgroundColor: 'transparent',
-                border: '1px solid #444',
-                color: '#666',
-                fontSize: '10px',
+                padding: '10px',
+                backgroundColor: 'rgba(204, 0, 0, 0.1)',
+                border: '1px solid #cc0000',
+                color: '#cc0000',
+                fontSize: '11px',
+                fontWeight: 'bold',
                 borderRadius: '4px',
                 cursor: 'pointer',
-                marginBottom: '10px',
-                transition: 'all 0.2s'
+                marginBottom: '12px',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
               }}
-              onMouseOver={(e) => { e.currentTarget.style.borderColor = '#cc0000'; e.currentTarget.style.color = '#cc0000'; }}
-              onMouseOut={(e) => { e.currentTarget.style.borderColor = '#444'; e.currentTarget.style.color = '#666'; }}
+              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#cc0000'; e.currentTarget.style.color = '#fff'; }}
+              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(204, 0, 0, 0.1)'; e.currentTarget.style.color = '#cc0000'; }}
             >
-              🔄 REINICIAR PROGRESSO
+              <span>🔄</span> REINICIAR JORNADA
             </button>
             <div style={{ fontSize: '10px', color: '#666', lineHeight: '1.4' }}>
               <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>ARAMAS v1.0</div>
