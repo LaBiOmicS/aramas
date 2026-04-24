@@ -11,9 +11,87 @@ export const focaCommands: Command[] = [
       const manuals: Record<string, string> = {
         ls: 'LS(1) - lista o conteúdo do diretório\n\nSINOPSE: ls [ARQUIVO]...\nDESCRIÇÃO: Lista informações sobre os ARQUIVOS.',
         chmod: 'CHMOD(1) - altera permissões de acesso a arquivos\n\nSINOPSE: chmod [OPÇÃO]... MODO[,MODO]... ARQUIVO...',
-        ip: 'IP(8) - exibe/manipula roteamento, dispositivos e túneis\n\nSINOPSE: ip [OPÇÕES] OBJETO {COMANDO | help}'
+        sbatch: 'SBATCH(1) - envia um script de lote para o Slurm\n\nSINOPSE: sbatch [OPÇÕES] SCRIPT'
       };
       ctx.print(manuals[page] || `Nenhuma entrada de manual para ${page}`);
+    }
+  },
+  {
+    name: 'du',
+    description: 'Estima o uso de espaço de arquivos',
+    help: 'du [OPÇÃO]... [ARQUIVO]...\n\nExibe o uso de disco de cada arquivo e diretório.\n\nOpções:\n  -h, --human-readable   tamanhos em formato legível (ex: 1K 234M 2G)\n  -s, --summarize        exibe apenas o total para cada argumento',
+    execute: async (ctx) => {
+      const h = ctx.args.includes('-h') || ctx.args.includes('--human-readable');
+      const s = ctx.args.includes('-s') || ctx.args.includes('--summarize');
+      const path = ctx.args.find(a => !a.startsWith('-')) || '.';
+      
+      if (s) {
+        ctx.print(`${h ? '452M' : '462848'}\t${path}`);
+      } else {
+        ctx.print(`${h ? '12K' : '12'}\t${path}/config`);
+        ctx.print(`${h ? '440M' : '450560'}\t${path}/data`);
+        ctx.print(`${h ? '452M' : '462848'}\t${path}`);
+      }
+    }
+  },
+  {
+    name: 'vim',
+    description: 'Vi IMproved, um editor de texto para programadores',
+    help: 'vim [ARQUIVO]\n\nInicia o editor de texto Vim. (Simulação visual)',
+    execute: async (ctx) => {
+      const file = ctx.args[0] || '[Novo Arquivo]';
+      ctx.clear();
+      const rows = 20;
+      for (let i = 0; i < rows; i++) {
+        if (i === 0) ctx.print(`\x1b[1;34m~   \x1b[0mBem-vindo ao Vim (Simulação)`);
+        else if (i === 1) ctx.print(`\x1b[1;34m~   \x1b[0mArquivo: ${file}`);
+        else if (i === 2) ctx.print(`\x1b[1;34m~\x1b[0m`);
+        else ctx.print(`\x1b[1;34m~\x1b[0m`);
+      }
+      ctx.print(`\x1b[7m"${file}" 0L, 0C                              1,1           Tudo\x1b[0m`);
+      ctx.print(`\x1b[1;30m(Pressione 'Ctrl+C' ou digite ':q' no prompt real para sair da simulação)\x1b[0m`);
+    }
+  },
+  {
+    name: 'sbatch',
+    description: 'Envia um script de lote para o Slurm',
+    help: 'sbatch [OPÇÕES] SCRIPT\n\nEnvia um script para execução no cluster.\n\nExemplo:\n  sbatch pipeline.sh',
+    execute: async (ctx) => {
+      const script = ctx.args[0];
+      if (!script) { ctx.printError('sbatch: erro: nenhum script especificado'); return; }
+      const jobId = Math.floor(Math.random() * 900000) + 100000;
+      ctx.print(`Submitted batch job ${jobId}`);
+    }
+  },
+  {
+    name: 'squeue',
+    description: 'Exibe a fila de jobs do Slurm',
+    help: 'squeue [OPÇÕES]\n\nOpções:\n  -u [user]   Lista apenas jobs do usuário',
+    execute: async (ctx) => {
+      ctx.print('             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)');
+      const jobId = Math.floor(Math.random() * 900000) + 100000;
+      ctx.print(`${jobId}     batch   pipeline  dayhoff  R       0:15      1 node-01`);
+      ctx.print(`${jobId+1}     batch   analysis  dayhoff  PD      0:00      1 (Resources)`);
+    }
+  },
+  {
+    name: 'sinfo',
+    description: 'Exibe informações sobre os nós e partições do Slurm',
+    help: 'sinfo\n\nExibe o estado dos recursos do cluster.',
+    execute: async (ctx) => {
+      ctx.print('PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST');
+      ctx.print('batch*       up   infinite      8   idle node-[01-08]');
+      ctx.print('gpu          up   infinite      2   busy node-09,node-10');
+    }
+  },
+  {
+    name: 'scancel',
+    description: 'Cancela jobs no Slurm',
+    help: 'scancel JOBID\n\nExemplo:\n  scancel 123456',
+    execute: async (ctx) => {
+      const id = ctx.args[0];
+      if (!id) { ctx.printError('scancel: erro: JOBID necessário'); return; }
+      ctx.print(`Job ${id} cancelled.`);
     }
   },
   {
