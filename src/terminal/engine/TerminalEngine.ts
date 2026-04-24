@@ -54,14 +54,15 @@ export class TerminalEngine {
     const banner = [
       '#'.repeat(totalWidth),
       '# ' + ' '.repeat(totalWidth - 4) + ' #',
-      formatLine('AMBIENTE DE ENSINO MULTIDISCIPLINAR - LABIOMICS', '1;33'),
+      formatLine('ARAMAS v1.0.0', '1;33'),
+      formatLine('Ambiente Remoto para o Aprendizado e Manipulação', '1'),
+      formatLine('de Arquivos e Sistemas', '1'),
       '# ' + ' '.repeat(totalWidth - 4) + ' #',
-      formatLine('Módulo 1: Fundamentos de Sistemas Operacionais', '1;32'),
-      formatLine('Módulo 2: Ferramentas de Manipulação de Dados', '1;32'),
-      formatLine('Módulo 3: Computação Científica e Ambientes', '1;32'),
+      formatLine('Desenvolvido por: LaBiOmicS - UMC', '1;32'),
+      formatLine('Terminal Educacional de Linux e Bioinformática', '1;32'),
       '# ' + ' '.repeat(totalWidth - 4) + ' #',
-      formatLine("Digite 'missao' para iniciar sua jornada.", '1;36'),
-      formatLine("Digite 'ajuda' para listar os comandos.", '1;36'),
+      formatLine("Digite 'ajuda' para começar a explorar.", '1;36'),
+      formatLine("Digite 'missao' para ver seus objetivos.", '1;36'),
       '# ' + ' '.repeat(totalWidth - 4) + ' #',
       '#'.repeat(totalWidth)
     ];

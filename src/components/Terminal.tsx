@@ -159,6 +159,15 @@ const Terminal: React.FC = () => {
         { name: 'head/tail', desc: 'Início ou fim do arquivo', example: 'head -n 20 data.txt' },
         { name: 'vim', desc: 'Editor de texto', example: 'vim config.yaml' },
       ]
+    },
+    {
+      title: '✨ Extras & Diversão',
+      commands: [
+        { name: 'cmatrix', desc: 'Efeito Matrix clássico', example: 'cmatrix' },
+        { name: 'foca-bio', desc: 'Segredo evolutivo', example: 'foca-bio' },
+        { name: 'samara', desc: 'Não recomendado...', example: 'samara' },
+        { name: 'ajuda', desc: 'Sobre o ARAMAS', example: 'ajuda' },
+      ]
     }
   ];
 
@@ -200,7 +209,7 @@ const Terminal: React.FC = () => {
             {sidebarOpen ? '✕' : '☰'}
           </button>
           <div style={{ fontWeight: 600, fontSize: '14px', letterSpacing: '0.5px' }}>
-            LABIOMICS <span style={{ color: '#007acc', fontWeight: 400 }}>TERMINAL</span>
+            ARAMAS <span style={{ color: '#007acc', fontWeight: 400 }}>| LABIOMICS</span>
           </div>
         </div>
         
@@ -273,12 +282,22 @@ const Terminal: React.FC = () => {
               </div>
             ))}
           </div>
+
+          {/* Rodapé da Sidebar com Créditos e Licença */}
+          <div style={{ padding: '15px', backgroundColor: '#0a0a0b', borderTop: '1px solid #333' }}>
+            <div style={{ fontSize: '10px', color: '#666', lineHeight: '1.4' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>ARAMAS v1.0</div>
+              Desenvolvido pelo <span style={{ color: '#007acc' }}>LaBiOmicS - UMC</span>
+              <br/>Recurso Pedagógico
+              <br/>Licença MIT
+            </div>
+          </div>
         </aside>
 
         <main style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#151515', position: 'relative' }}>
           <div style={{ height: '35px', backgroundColor: '#1a1a1b', display: 'flex', alignItems: 'center', padding: '0 15px', fontSize: '11px', color: '#888', borderBottom: '1px solid #111' }}>
             <span style={{ color: '#0dbc79', marginRight: '8px' }}>➜</span>
-            terminal — bash — dayhoff@LaBiOmicS
+            ARAMAS — bash — dayhoff@UMC
           </div>
           <div 
             ref={terminalRef} 
