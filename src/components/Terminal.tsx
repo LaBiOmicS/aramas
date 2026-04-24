@@ -231,12 +231,30 @@ const Terminal: React.FC = () => {
       </header>
 
       <div style={{ display: 'flex', flex: 1, position: 'relative', overflow: 'hidden' }}>
+        {/* Overlay para fechar o menu no mobile ao clicar fora */}
+        {isMobile && sidebarOpen && (
+          <div 
+            onClick={() => setSidebarOpen(false)}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              zIndex: 90,
+              cursor: 'pointer',
+              animation: 'fadeIn 0.3s ease'
+            }}
+          />
+        )}
+
         <aside style={{ 
           width: isMobile ? '280px' : (sidebarOpen ? '300px' : '0px'), 
           height: '100%', 
           backgroundColor: '#111112', 
           borderRight: (sidebarOpen || !isMobile) ? '1px solid #333' : 'none',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -245,7 +263,9 @@ const Terminal: React.FC = () => {
           left: 0,
           top: 0,
           transform: isMobile && !sidebarOpen ? 'translateX(-100%)' : 'translateX(0)',
-          boxShadow: isMobile && sidebarOpen ? '10px 0 15px rgba(0,0,0,0.5)' : 'none'
+          boxShadow: isMobile && sidebarOpen ? '10px 0 15px rgba(0,0,0,0.5)' : 'none',
+          visibility: !isMobile && !sidebarOpen ? 'hidden' : 'visible',
+          pointerEvents: isMobile && !sidebarOpen ? 'none' : 'auto'
         }}>
           <div style={{ padding: '20px 15px', backgroundColor: '#1a1a1b', borderBottom: '1px solid #333' }}>
             <div style={{ fontSize: '10px', color: '#888', fontWeight: 700, marginBottom: '8px', textTransform: 'uppercase' }}>Perfil do Estudante</div>
