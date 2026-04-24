@@ -31,6 +31,7 @@ const Terminal: React.FC = () => {
 
     const xterm = new XTerm({
       cursorBlink: true,
+      scrollback: 1000,
       theme: {
         background: '#151515',
         foreground: '#d4d4d4',

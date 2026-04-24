@@ -19,11 +19,19 @@ export class CommandRegistry {
       description: 'Exibe informações sobre os comandos disponíveis',
       execute: async (ctx) => {
         ctx.print('\x1b[1;32mComandos disponíveis:\x1b[0m');
-        const commands = Array.from(this.commands.values());
-        const sortedCommands = commands.sort((a, b) => a.name.localeCompare(b.name));
+        
+        // Pegar apenas comandos únicos (evitar duplicatas de apelidos como 'help' e 'ajuda')
+        const uniqueCommands = new Map<string, Command>();
+        this.commands.forEach((cmd) => {
+          if (!uniqueCommands.has(cmd.name)) {
+            uniqueCommands.set(cmd.name, cmd);
+          }
+        });
+
+        const sortedCommands = Array.from(uniqueCommands.values()).sort((a, b) => a.name.localeCompare(b.name));
         
         for (const cmd of sortedCommands) {
-          const name = cmd.name.padEnd(10);
+          const name = cmd.name.padEnd(12);
           ctx.print(`  \x1b[1;36m${name}\x1b[0m - ${cmd.description}`);
         }
         
@@ -43,6 +51,7 @@ export class CommandRegistry {
     // mas vamos registrar aqui para aparecerem no 'ajuda'
     this.commands.set('tema', { name: 'tema', description: 'Muda o estilo visual do terminal', execute: async () => {} });
     this.commands.set('missao', { name: 'missao', description: 'Mostra o objetivo atual', execute: async () => {} });
+    this.commands.set('quest', { name: 'missao', description: 'Mostra o objetivo atual', execute: async () => {} });
   }
 
   public getCommand(name: string): Command | undefined {
