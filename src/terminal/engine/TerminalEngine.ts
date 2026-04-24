@@ -282,10 +282,40 @@ export class TerminalEngine {
 
       const width = 65;
       const drawLine = (content: string, color: string = '') => {
-        // Remove códigos ANSI para calcular o comprimento visível
-        const visibleLength = content.replace(/\x1b\[[0-9;]*m/g, '').replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, ' ').length;
-        const padding = ' '.repeat(Math.max(0, width - visibleLength));
-        return `║ ${color}${content}\x1b[0m${padding} ║\r\n`;
+        const result: string[] = [];
+        let remaining = content;
+
+        while (true) {
+          let visibleLen = 0;
+          let breakIdx = remaining.length;
+          let lastSpace = -1;
+
+          for (let i = 0; i < remaining.length; i++) {
+            if (remaining[i] === '\x1b') {
+              const match = remaining.slice(i).match(/^\x1b\[[0-9;]*m/);
+              if (match) { i += match[0].length - 1; continue; }
+            }
+            if (remaining[i] === ' ') lastSpace = i;
+            
+            visibleLen++;
+            if (/[\uD800-\uDBFF]/.test(remaining[i])) i++;
+
+            if (visibleLen > width) {
+              breakIdx = lastSpace !== -1 ? lastSpace : i;
+              break;
+            }
+          }
+
+          const line = remaining.slice(0, breakIdx);
+          const vLen = line.replace(/\x1b\[[0-9;]*m/g, '').replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, ' ').length;
+          const padding = ' '.repeat(Math.max(0, width - vLen));
+          result.push(`║ ${color}${line}\x1b[0m${padding} ║\r\n`);
+
+          remaining = remaining.slice(breakIdx).trim();
+          if (!remaining) break;
+          remaining = '    ' + remaining;
+        }
+        return result.join('');
       };
 
       this.terminal.write(`\r\n\x1b[1;35m╔${'═'.repeat(width + 2)}╗\x1b[0m\r\n`);
