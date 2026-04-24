@@ -16,6 +16,7 @@ export class TerminalEngine {
   private historyIndex: number = -1;
   private onStateChange?: () => void;
   private promptStyle: PromptStyle = 'bash';
+  private isResetting: boolean = false;
 
   private currentUser: string = 'dayhoff';
   private currentEnv: string = '';
@@ -98,10 +99,11 @@ export class TerminalEngine {
   }
 
   public async resetSystem() {
+    this.isResetting = true;
     this.questManager.reset();
     localStorage.clear();
-    this.terminal.write('\r\n\x1b[1;32mSistema resetado com sucesso. Reiniciando...\x1b[0m\r\n');
-    setTimeout(() => window.location.reload(), 1000);
+    this.terminal.write('\r\n\x1b[1;32mSISTEMA RESETADO. REINICIANDO...\x1b[0m\r\n');
+    window.location.reload();
   }
 
   private printPrompt() {
@@ -151,6 +153,7 @@ export class TerminalEngine {
   }
 
   private saveState() {
+    if (this.isResetting) return;
     localStorage.setItem('vfs_state', JSON.stringify(this.vfs.getState()));
     localStorage.setItem('prompt_style', this.promptStyle);
     localStorage.setItem('current_user', this.currentUser);

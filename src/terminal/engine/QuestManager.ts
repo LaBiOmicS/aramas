@@ -561,6 +561,7 @@ export class QuestManager {
   private currentQuestIndex: number = 0;
   private totalXp: number = 0;
   private stats = { sudoCount: 0, pipeCount: 0, envCount: 1 };
+  private isResetting = false;
 
   constructor() {
     this.loadState();
@@ -579,6 +580,7 @@ export class QuestManager {
   }
 
   private saveState() {
+    if (this.isResetting) return;
     localStorage.setItem('quest_manager_state', JSON.stringify({
       index: this.currentQuestIndex,
       xp: this.totalXp,
@@ -605,6 +607,7 @@ export class QuestManager {
   }
 
   public reset() {
+    this.isResetting = true;
     this.currentQuestIndex = 0;
     this.totalXp = 0;
     this.stats = { sudoCount: 0, pipeCount: 0, envCount: 1 };
@@ -612,7 +615,6 @@ export class QuestManager {
     localStorage.removeItem('terminal_envs');
     localStorage.removeItem('current_env');
     localStorage.removeItem('vfs_state');
-    this.saveState();
   }
 
   public checkProgress(vfs: VFSManager, lastCommand: string, fullLine: string): {quest: Quest, rankUp: boolean} | null {
