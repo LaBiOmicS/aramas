@@ -325,11 +325,12 @@ const Terminal: React.FC = () => {
             style={{ 
               flex: 1, 
               width: '100%',
-              padding: '10px',
-              boxSizing: 'border-box'
+              padding: '0',
+              margin: '0',
+              boxSizing: 'border-box',
+              overflow: 'hidden'
             }} 
-          />
-        </main>
+          />        </main>
       </div>
     </div>
   );

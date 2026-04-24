@@ -111,6 +111,7 @@ export class TerminalEngine {
         break;
       }
     }
+    this.terminal.scrollToBottom();
   }
 
   private async handleData(data: string) {
