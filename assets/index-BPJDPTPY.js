@@ -440,17 +440,35 @@ Comandos:
 Construindo árvore de dependências... Pronto`),e.print(`Os seguintes pacotes NOVOS serão instalados:\n  ${n}`),e.print(`0 atualizados, 1 novos instalados, 0 a serem removidos.\nInstalando ${n}... [OK]`),mc(`system`,n)):t===`remove`&&n?(e.print(`Removendo ${n}... [OK]\nLimpando base de dados... Pronto`),hc(`system`,n)):t===`update`?e.print(`Atingido:1 http://archive.ubuntu.com/ubuntu jammy InRelease
 Lendo listas de pacotes... Pronto`):e.print(`Uso: apt [install|remove|update] [pacote]`)}},{name:`docker`,description:`Gerenciador de containers Docker`,help:`docker [COMANDO] [OPÇÕES]
 
-Plataforma para containers.
+Plataforma para containers e orquestração.
 
 Comandos:
-  pull [img]      Baixa uma imagem do Docker Hub
-  run [img]       Cria e inicia um container
-  ps              Lista containers em execução
-  images          Lista imagens locais
-  build -t [tag]  Cria imagem a partir do Dockerfile atual
-  rm [id]         Remove um container
-  rmi [id]        Remove uma imagem`,execute:async e=>{let t=e.args[0],n=()=>JSON.parse(localStorage.getItem(`docker_images`)||`["ubuntu:latest", "nginx:latest"]`),r=e=>{let t=n();t.includes(e)||(t.push(e),localStorage.setItem(`docker_images`,JSON.stringify(t)))},i=()=>JSON.parse(localStorage.getItem(`docker_containers`)||`[]`),a=(e,t)=>{let n=i();n.push({id:Math.random().toString(36).substring(2,14),image:e,name:t,status:`Up 2 minutes`}),localStorage.setItem(`docker_containers`,JSON.stringify(n))};if(t===`pull`){let t=e.args[1];if(!t){e.printError(`docker pull: erro: imagem não especificada`);return}e.print(`Using default tag: latest\nlatest: Pulling from library/${t}`),e.print(`\x1B[32m7b1a2: Pull complete\x1B[0m
-\x1B[32m5e44a: Pull complete\x1B[0m`),e.print(`Digest: sha256:88a5...\nStatus: Downloaded newer image for ${t}:latest`),r(t.includes(`:`)?t:`${t}:latest`)}else if(t===`run`){let t=e.args.find(e=>!e.startsWith(`-`)&&e!==`run`);if(!t){e.printError(`docker run: erro: imagem não especificada`);return}let i=e.args.includes(`-it`),o=e.args.includes(`--name`)?e.args[e.args.indexOf(`--name`)+1]:`brave_${Math.random().toString(36).substring(7)}`;!n().includes(t)&&!n().includes(`${t}:latest`)&&(e.print(`Unable to find image '${t}' locally`),e.print(`latest: Pulling from library/${t}... done`),r(t.includes(`:`)?t:`${t}:latest`)),a(t,o),i?(e.print(`\nroot@${Math.random().toString(36).substring(7)}:/# `),e.print(`\x1B[1;30m(Simulando terminal interativo... digite 'exit' para sair)\x1B[0m`)):e.print(`Container started: ${o}`)}else if(t===`build`){let t=e.args.indexOf(`-t`),n=t===-1?`latest`:e.args[t+1];e.vfs.readFile(`Dockerfile`,e.user)?(e.print(`\x1B[1m[+] Building 5.2s (8/8) FINISHED\x1B[0m`),e.print(` => [internal] load build definition from Dockerfile       0.1s`),e.print(` => [internal] load .dockerignore                            0.0s`),e.print(` => [1/3] FROM ubuntu:22.04                                  2.1s`),e.print(` => [2/3] RUN apt-get update && apt-get install samtools     1.8s`),e.print(` => [3/3] CMD ["samtools"]                                   0.1s`),e.print(` => exporting to image                                       0.2s`),e.print(` => naming to docker.io/library/${n}                       0.0s`),r(n.includes(`:`)?n:`${n}:latest`)):e.printError(`docker build: erro: Dockerfile não encontrado no diretório atual`)}else if(t===`ps`)e.print(`CONTAINER ID   IMAGE          COMMAND    CREATED         STATUS         NAMES`),i().forEach(t=>{e.print(`${t.id.padEnd(14)} ${t.image.padEnd(14)} "bash"     2 minutes ago   ${t.status.padEnd(14)} ${t.name}`)});else if(t===`images`)e.print(`REPOSITORY     TAG       IMAGE ID       CREATED       SIZE`),n().forEach(t=>{let[n,r]=t.split(`:`);e.print(`${(n||`ubuntu`).padEnd(14)} ${(r||`latest`).padEnd(9)} ba627c2e3661   2 weeks ago   72.8MB`)});else if(t===`rm`){let t=e.args[1],n=i().filter(e=>e.id!==t&&e.name!==t);localStorage.setItem(`docker_containers`,JSON.stringify(n)),e.print(t)}else if(t===`rmi`){let t=e.args[1],r=n().filter(e=>e!==t);localStorage.setItem(`docker_images`,JSON.stringify(r)),e.print(`Untagged: ${t}\nDeleted: sha256:ba627...`)}else e.print(`Usage: docker [pull|run|ps|images|build|rm|rmi]`)}},{name:`pixi`,description:`Gerenciador moderno (Pixi)`,help:`pixi [COMANDO] [OPÇÕES]
+  pull [img]      Baixa uma imagem
+  run [img]       Inicia um container
+  ps              Lista containers
+  images          Lista imagens
+  build -t [tag]  Cria imagem a partir do Dockerfile
+  compose up      Inicia serviços (docker-compose)
+  swarm init      Inicia modo Swarm
+  service create  Cria serviço no Swarm
+  rm/rmi          Remove container/imagem`,execute:async e=>{let t=e.args[0],n=()=>JSON.parse(localStorage.getItem(`docker_images`)||`["ubuntu:latest", "nginx:latest"]`),r=e=>{let t=n();t.includes(e)||(t.push(e),localStorage.setItem(`docker_images`,JSON.stringify(t)))},i=()=>JSON.parse(localStorage.getItem(`docker_containers`)||`[]`),a=(e,t)=>{let n=i();n.push({id:Math.random().toString(36).substring(2,14),image:e,name:t,status:`Up 2 minutes`}),localStorage.setItem(`docker_containers`,JSON.stringify(n))};if(t===`pull`){let t=e.args[1];if(!t){e.printError(`docker pull: imagem não especificada`);return}e.print(`Pulling from library/${t}...\n\x1b[32mDone\x1b[0m`),r(t.includes(`:`)?t:`${t}:latest`)}else if(t===`run`){let t=e.args.find(e=>!e.startsWith(`-`)&&e!==`run`);if(!t){e.printError(`docker run: imagem não especificada`);return}a(t,`brave_${Math.random().toString(36).substring(7)}`),e.print(`Container started.`)}else if(t===`ps`)e.print(`CONTAINER ID   IMAGE          STATUS         NAMES`),i().forEach(t=>e.print(`${t.id.padEnd(14)} ${t.image.padEnd(14)} ${t.status.padEnd(14)} ${t.name}`));else if(t===`compose`&&e.args[1]===`up`)e.print(`\x1B[1;34m[+] Running 2/2\x1B[0m
+ ⠿ Container db      Created
+ ⠿ Container web     Created
+\x1B[1;32m⠿ Container db      Started\x1B[0m
+\x1B[1;32m⠿ Container web     Started\x1B[0m`);else if(t===`swarm`&&e.args[1]===`init`)e.print(`Swarm initialized: current node (node-1) is now a manager.`),e.print(`To add a worker to this swarm, run the following command:
+  docker swarm join --token SWMTKN-1-abc... 192.168.1.1:2377`);else if(t===`service`&&e.args[1]===`create`){let t=e.args.find(e=>e.startsWith(`--name`))?.split(`=`)[1]||`myservice`;e.print(`Service created: ${t} (ID: ${Math.random().toString(36).substring(2,10)})`)}else t===`images`?(e.print(`REPOSITORY     TAG       IMAGE ID`),n().forEach(t=>e.print(`${t.split(`:`)[0].padEnd(14)} ${t.split(`:`)[1].padEnd(9)} ba627c2e3661`))):e.print(`Uso: docker [pull|run|ps|images|compose up|swarm init|service create]`)}},{name:`singularity`,description:`Plataforma de containers para HPC e Ciência`,help:`singularity [COMANDO] [OPÇÕES]
+
+Foco em segurança e ambientes científicos.
+
+Comandos:
+  pull [url]      Baixa imagem do Sylabs/Docker Hub (.sif)
+  build [img]     Cria uma imagem a partir de uma receita
+  exec [img] [cmd] Executa um comando dentro do container
+  run [img]       Executa o script padrão do container
+  shell [img]     Inicia um shell interativo
+  inspect [img]   Mostra metadados da imagem`,execute:async e=>{let t=e.args[0],n=e.args[1]||`ubuntu.sif`;t===`pull`?(e.print(`INFO:    Converting SIF file to temporary sandbox...`),e.print(`INFO:    Creating SIF file...`),e.print(`\x1b[1;32mINFO:    Build complete: ${n.split(`/`).pop()||`image.sif`}\x1b[0m`)):t===`exec`?e.print(`\x1b[1;30m(Singularity: ${n})\x1b[0m\n${e.user}`):t===`run`?(e.print(`Iniciando ambiente científico em ${n}...`),e.print(`Ubuntu 22.04 LTS (Singularity Instance)`)):t===`shell`?e.print(`Singularity> \x1B[1;30m(Simulando shell... digite 'exit' para sair)\x1B[0m`):t===`build`?(e.print(`INFO:    Starting build...`),e.print(`INFO:    Running post-install scripts...`),e.print(`\x1b[1;32mINFO:    Build complete: ${n}\x1b[0m`)):e.print(`Uso: singularity [pull|build|exec|run|shell|inspect]`)}},{name:`apptainer`,description:`O sucessor do Singularity (HPC)`,help:`apptainer [COMANDO] [OPÇÕES]
+
+Alias moderno para o Singularity. Mesma sintaxe e funcionalidades.`,execute:async e=>{let t=gc.find(e=>e.name===`singularity`);t&&await t.execute(e)}},{name:`pixi`,description:`Gerenciador moderno (Pixi)`,help:`pixi [COMANDO] [OPÇÕES]
 
 Gerenciador de pacotes baseado em Conda para múltiplos sistemas operacionais.
 
