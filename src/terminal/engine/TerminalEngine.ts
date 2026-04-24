@@ -102,7 +102,6 @@ export class TerminalEngine {
     this.isResetting = true;
     this.questManager.reset();
     localStorage.clear();
-    this.terminal.write('\r\n\x1b[1;32mSISTEMA RESETADO. REINICIANDO...\x1b[0m\r\n');
     window.location.reload();
   }
 
@@ -309,15 +308,15 @@ export class TerminalEngine {
     }
 
     if (cmdName === 'reset') {
-      this.terminal.write('\x1b[1;31mATENÇÃO: Isso apagará todo o seu progresso e arquivos criados!\x1b[0m\r\n');
-      this.terminal.write('Você tem certeza que deseja resetar? (s/n): ');
+      this.terminal.write('\x1b[1;31m⚠ PERIGO: Esta ação apagará permanentemente todo o seu progresso, XP e arquivos.\x1b[0m\r\n');
+      this.terminal.write('Confirmar reinicialização do sistema? (s/n): ');
       
       const handleReset = async (data: string) => {
         const input = data.toLowerCase();
         if (input === 's') {
           await this.resetSystem();
         } else {
-          this.terminal.write('\r\nOperação cancelada.\r\n');
+          this.terminal.write('\r\n\x1b[1;32mOperação cancelada.\x1b[0m\r\n');
           this.printPrompt();
         }
         this.terminal.onData(e => this.handleData(e));
