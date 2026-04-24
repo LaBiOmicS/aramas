@@ -334,8 +334,8 @@ const Terminal: React.FC = () => {
           <div style={{ padding: '15px', backgroundColor: '#0a0a0b', borderTop: '1px solid #333' }}>
             <button 
               onClick={() => {
-                if (engineRef.current && window.confirm('Você tem certeza que deseja resetar todo o seu progresso?')) {
-                  engineRef.current.triggerCommand('reset');
+                if (engineRef.current && window.confirm('Você tem certeza que deseja resetar todo o seu progresso? Isso apagará todos os arquivos criados e seu XP.')) {
+                  engineRef.current.resetSystem();
                 }
               }}
               style={{

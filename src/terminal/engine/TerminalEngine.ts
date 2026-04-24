@@ -298,25 +298,30 @@ export class TerminalEngine {
       return;
     }
 
+  public async resetSystem() {
+    this.questManager.reset();
+    localStorage.clear();
+    this.terminal.write('\r\n\x1b[1;32mSistema resetado com sucesso. Reiniciando...\x1b[0m\r\n');
+    setTimeout(() => window.location.reload(), 1000);
+  }
+
+  private async executeCommand(line: string) {
+...
     if (cmdName === 'reset') {
       this.terminal.write('\x1b[1;31mATENÇÃO: Isso apagará todo o seu progresso e arquivos criados!\x1b[0m\r\n');
       this.terminal.write('Você tem certeza que deseja resetar? (s/n): ');
       
-      const handleReset = (data: string) => {
+      const handleReset = async (data: string) => {
         const input = data.toLowerCase();
         if (input === 's') {
-          this.questManager.reset();
-          localStorage.clear(); // Limpa tudo
-          this.terminal.write('\r\n\x1b[1;32mSistema resetado com sucesso. Reiniciando...\x1b[0m\r\n');
-          setTimeout(() => window.location.reload(), 1500);
+          await this.resetSystem();
         } else {
           this.terminal.write('\r\nOperação cancelada.\r\n');
           this.printPrompt();
         }
-        this.terminal.onData(e => this.handleData(e)); // Restaura o handler original
+        this.terminal.onData(e => this.handleData(e));
       };
 
-      // Temporariamente muda o handler para ler a confirmação
       const sub = this.terminal.onData(e => {
         sub.dispose();
         handleReset(e);
