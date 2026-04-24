@@ -5,6 +5,11 @@ import './App.css';
 const App: React.FC = () => {
   const [showTerminal, setShowTerminal] = useState(false);
 
+  const handleStart = () => {
+    setShowTerminal(true);
+    window.scrollTo(0, 0);
+  };
+
   if (showTerminal) {
     return <Terminal />;
   }
@@ -24,7 +29,7 @@ const App: React.FC = () => {
               <span className="badge">Bioinformática</span>
               <span className="badge">Gamificado</span>
             </div>
-            <button className="cta-button" onClick={() => setShowTerminal(true)}>
+            <button className="cta-button" onClick={handleStart}>
               ACESSAR TERMINAL <span className="arrow">→</span>
             </button>
           </div>
