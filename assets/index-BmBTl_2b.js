@@ -231,28 +231,152 @@ Lista informações sobre todos os dispositivos de bloco disponíveis.`,execute:
 └─sda1   8:1    0    50G  0 part /`),e.print(`sr0     11:0    1  1024M  0 rom`)}}],lc=[{name:`bio-count`,description:`Conta a frequência de bases (A, T, C, G) em uma sequência ou arquivo`,help:`bio-count [SEQUÊNCIA | ARQUIVO]
 
 Calcula a frequência de nucleotídeos, total de pares de bases e conteúdo GC.
-Se o argumento for um arquivo existente, lê o arquivo; caso contrário, processa a string fornecida.`,execute:async e=>{let t=e.args[0];if(!t){e.printError(`Uso: bio-count [sequência ou arquivo]`);return}let n=(e.vfs.readFile(t)||t).toUpperCase(),r={A:0,T:0,C:0,G:0,N:0};for(let e of n)r[e]===void 0?/[A-Z]/.test(e)&&r.N++:r[e]++;e.print(`\x1B[1;32mRelatório de Sequência:\x1B[0m`),e.print(`  A: ${r.A}`),e.print(`  T: ${r.T}`),e.print(`  C: ${r.C}`),e.print(`  G: ${r.G}`),r.N>0&&e.print(`  Outros/N: ${r.N}`);let i=r.A+r.T+r.C+r.G+r.N,a=((r.G+r.C)/(r.A+r.T+r.C+r.G)*100).toFixed(2);e.print(`  Total: ${i} bp`),e.print(`  Conteúdo GC: ${a}%`)}},{name:`bio-rev-comp`,description:`Gera o complemento reverso de uma sequência de DNA`,help:`bio-rev-comp [SEQUÊNCIA | ARQUIVO]
+Se o argumento for um arquivo existente, lê o arquivo; caso contrário, processa a string fornecida.`,execute:async e=>{let t=e.args[0];if(!t){e.printError(`Uso: bio-count [sequência ou arquivo]`);return}let n=(e.vfs.readFile(t)||t).toUpperCase(),r={A:0,T:0,C:0,G:0,N:0};for(let e of n)r[e]===void 0?/[A-Z]/.test(e)&&r.N++:r[e]++;e.print(`\x1B[1;32mRelatório de Sequência:\x1B[0m`),e.print(`  A: ${r.A}\n  T: ${r.T}\n  C: ${r.C}\n  G: ${r.G}`),r.N>0&&e.print(`  Outros/N: ${r.N}`);let i=r.A+r.T+r.C+r.G+r.N,a=i>0?((r.G+r.C)/(r.A+r.T+r.C+r.G)*100).toFixed(2):`0.00`;e.print(`  Total: ${i} bp\n  Conteúdo GC: ${a}%`)}},{name:`bio-rev-comp`,description:`Gera o complemento reverso de uma sequência de DNA`,help:`bio-rev-comp [SEQUÊNCIA | ARQUIVO]
 
-Gera a sequência complementar reversa (5'->3').
-Aceita string direta ou caminho de arquivo.`,execute:async e=>{let t=e.args[0];if(!t){e.printError(`Uso: bio-rev-comp [sequência ou arquivo]`);return}let n=(e.vfs.readFile(t)||t).toUpperCase(),r={A:`T`,T:`A`,C:`G`,G:`C`,N:`N`,R:`Y`,Y:`R`,S:`S`,W:`W`},i=n.split(``).reverse().map(e=>r[e]||e).join(``);e.print(i)}},{name:`fasta-view`,description:`Visualiza arquivos FASTA com destaque de cor`,help:`fasta-view ARQUIVO
+Gera a sequência complementar reversa (5'->3').`,execute:async e=>{let t=e.args[0];if(!t){e.printError(`Uso: bio-rev-comp [sequência ou arquivo]`);return}let n=(e.vfs.readFile(t)||t).toUpperCase(),r={A:`T`,T:`A`,C:`G`,G:`C`,N:`N`},i=n.split(``).reverse().map(e=>r[e]||e).join(``);e.print(i)}},{name:`fasta-view`,description:`Visualiza arquivos FASTA com destaque de cor`,help:`fasta-view ARQUIVO
 
-Exibe o conteúdo de um arquivo FASTA com cores para os nucleotídeos (A, T, C, G) e destaque para o cabeçalho.`,execute:async e=>{let t=e.args[0];if(!t){e.printError(`Uso: fasta-view [arquivo]`);return}let n=e.vfs.readFile(t);if(n===null){e.printError(`fasta-view: ${t}: Arquivo não encontrado`);return}let r=n.split(`
-`);for(let t of r)if(t.startsWith(`>`))e.print(`\x1b[1;34m${t}\x1b[0m`);else{let n=t.replace(/A/g,`\x1B[1;32mA\x1B[0m`).replace(/T/g,`\x1B[1;31mT\x1B[0m`).replace(/C/g,`\x1B[1;33mC\x1B[0m`).replace(/G/g,`\x1B[1;36mG\x1B[0m`);e.print(n)}}},{name:`samtools`,description:`Ferramentas para manipular alinhamentos de sequências (SAM/BAM)`,help:`samtools [COMANDO] [OPÇÕES]
+Exibe o conteúdo de um arquivo FASTA com cores para os nucleotídeos.`,execute:async e=>{let t=e.args[0];if(!t){e.printError(`Uso: fasta-view [arquivo]`);return}let n=e.vfs.readFile(t);if(n===null){e.printError(`fasta-view: ${t}: Arquivo não encontrado`);return}n.split(`
+`).forEach(t=>{t.startsWith(`>`)?e.print(`\x1b[1;34m${t}\x1b[0m`):e.print(t.replace(/A/g,`\x1B[1;32mA\x1B[0m`).replace(/T/g,`\x1B[1;31mT\x1B[0m`).replace(/C/g,`\x1B[1;33mC\x1B[0m`).replace(/G/g,`\x1B[1;36mG\x1B[0m`))})}},{name:`fastqc`,description:`Controle de qualidade de dados de sequenciamento de alto rendimento`,help:`fastqc [OPÇÕES] arquivo.fastq
 
-Suite para manipulação de arquivos SAM/BAM.
+Gera um relatório HTML com métricas de qualidade das leituras.`,execute:async e=>{if(!e.args[0]){e.printError(`Uso: fastqc seqfile1 seqfile2 .. seqfileN`);return}e.print(`Started analysis of ${e.args[0]}`),await new Promise(e=>setTimeout(e,800)),e.print(`Analysis complete for ${e.args[0]}\nHTML report saved to ${e.args[0].split(`.`)[0]}_fastqc.html\nZIP archive saved to ${e.args[0].split(`.`)[0]}_fastqc.zip`)}},{name:`multiqc`,description:`Agrega relatórios de bioinformática em um único documento`,help:`multiqc [DIRETÓRIO]
+
+Busca por relatórios (ex: FastQC, STAR, Salmon) e os unifica.`,execute:async e=>{e.print(`[INFO   ]         multiqc : This is MultiQC v1.14`),e.print(`[INFO   ]         multiqc : Template    : default`),e.print(`[INFO   ]         multiqc : Searching '${e.args[0]||`.`}'`),await new Promise(e=>setTimeout(e,600)),e.print(`[INFO   ]          fastqc : Found 4 reports`),e.print(`[INFO   ]             bwa : Found 2 reports`),e.print(`[INFO   ]         multiqc : Report      : multiqc_report.html`),e.print(`[INFO   ]         multiqc : Data        : multiqc_data`),e.print(`[INFO   ]         multiqc : MultiQC complete`)}},{name:`trimmomatic`,description:`Aparador de leituras flexível para dados Illumina`,help:`trimmomatic PE/SE [arquivos] [etapas]
+
+Filtra e apara leituras de sequenciamento por qualidade e adaptadores.`,execute:async e=>{e.print(`TrimmomaticPE: Started with arguments: ${e.args.join(` `)}`),e.print(`Multiple cores found: Using 4 threads`),await new Promise(e=>setTimeout(e,700)),e.print(`Input Read Pairs: 100000 Both Surviving: 95000 (95.00%) Forward Only Surviving: 2000 (2.00%) Reverse Only Surviving: 1500 (1.50%) Dropped: 1500 (1.50%)`),e.print(`TrimmomaticPE: Completed successfully`)}},{name:`fastp`,description:`Aparador e filtrador ultra-rápido all-in-one para FASTQ`,help:`fastp -i in.fq -o out.fq
+
+Ferramenta rápida baseada em C++ para QC e trimming.`,execute:async e=>{e.print(`Read1 before filtering:`),e.print(`total reads: 100000
+total bases: 15000000
+Q20 bases: 97.5%
+Q30 bases: 92.1%`),await new Promise(e=>setTimeout(e,500)),e.print(`
+Filtering result:
+reads passed filter: 98000
+reads failed due to low quality: 1500
+reads failed due to too many N: 500`),e.print(`
+JSON report: fastp.json
+HTML report: fastp.html`)}},{name:`bwa`,description:`Burrows-Wheeler Aligner para mapeamento de leituras contra genoma de referência`,help:`bwa mem ref.fa read1.fq [read2.fq]
+
+Realiza o alinhamento de leituras (reads) utilizando o algoritmo BWA-MEM.`,execute:async e=>{let t=e.args[0];t===`index`?e.print(`[bwa_index] Pack FASTA... 0.05 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 1.50 sec
+[bwa_index] Update BWT... 0.02 sec`):t===`mem`?(e.print(`[M::bwa_idx_load] loaded the bwa index from genome.fa`),e.print(`[M::process] read 100000 sequences (15000000 bp)...`),await new Promise(e=>setTimeout(e,800)),e.print(`[M::mem_process_seqs] Processed 100000 reads in 2.345 CPU sec, 0.654 real sec`),e.print(`[main] Version: 0.7.17-r1188\n[main] CMD: bwa ${e.args.join(` `)}\n[main] Real time: 0.812 sec; CPU: 2.501 sec`)):e.print(`Usage: bwa <command> [options]
+Commands:
+  index         index sequences in the FASTA format
+  mem           BWA-MEM algorithm`)}},{name:`bowtie2`,description:`Alinhador rápido e sensível de leituras para genomas longos`,help:`bowtie2 -x <bt2-idx> {-1 <m1> -2 <m2> | -U <r>} -S <sam>
+
+Constrói índices e mapeia leituras de DNA.`,execute:async e=>{if(e.args.length===0){e.print(`Bowtie 2 version 2.4.4
+Usage: bowtie2 [options]* -x <bt2-idx> {-1 <m1> -2 <m2> | -U <r>} [-S <sam>]`);return}e.print(`100000 reads; of these:`),e.print(`  100000 (100.00%) were paired; of these:`),e.print(`    5000 (5.00%) aligned concordantly 0 times`),e.print(`    90000 (90.00%) aligned concordantly exactly 1 time`),e.print(`    5000 (5.00%) aligned concordantly >1 times`),e.print(`95.00% overall alignment rate`)}},{name:`minimap2`,description:`Alinhador versátil para sequências de DNA/RNA`,help:`minimap2 -a ref.fa query.fq > aln.sam
+
+Especialmente bom para reads longos (PacBio/Nanopore) ou genomas completos.`,execute:async e=>{if(e.args.length===0){e.print(`Usage: minimap2 [options] <target.fa>|<target.mmi> [query.fa] [...]`);return}e.print(`[M::mm_idx_gen::0.151*0.98] collected minimizers`),e.print(`[M::mm_idx_set::0.211*1.05] applied heuristic cutoff`),await new Promise(e=>setTimeout(e,600)),e.print(`[M::map_opt] read 50000 sequences`),e.print(`[M::worker_pipeline::1.250*2.88] mapped 50000 sequences`),e.print(`[main] Version: 2.24-r1122\n[main] CMD: minimap2 ${e.args.join(` `)}\n[main] Real time: 1.304 sec; CPU: 3.652 sec`)}},{name:`star`,description:`Spliced Transcripts Alignment to a Reference`,help:`STAR --genomeDir [dir] --readFilesIn [fastq]
+
+Alinhador ultra-rápido otimizado para dados de RNA-Seq.`,execute:async e=>{e.print(`STAR --runThreadN 4 --genomeDir ref/ --readFilesIn reads.fastq`),e.print(`Apr 23 14:00:01 ..... started STAR run`),e.print(`Apr 23 14:00:05 ..... loading genome`),await new Promise(e=>setTimeout(e,800)),e.print(`Apr 23 14:00:20 ..... started mapping`),e.print(`Apr 23 14:00:45 ..... finished mapping`),e.print(`Apr 23 14:00:46 ..... finished successfully`)}},{name:`samtools`,description:`Ferramentas para manipular alinhamentos de sequências (SAM/BAM/CRAM)`,help:`samtools [COMANDO] [OPÇÕES]
+
+Suite para conversão, ordenação, indexação e visualização de alinhamentos.
 
 Comandos:
-  view       Exibe alinhamentos
-  flagstat   Resumo estatístico do mapeamento`,execute:async e=>{let t=e.args[0];t===`view`?(e.print(`r001	163	chr1	7	30	8M2I4M	=	37	39	TTAGATAAAGAGG	*`),e.print(`r002	0	chr1	9	30	3S6M1P1I4M	*	0	0	AAAAGATAAGGATA	*`)):t===`flagstat`?e.print(`20000 + 0 in total (QC-passed reads + QC-failed reads)
+  view       Exibe ou converte arquivos SAM/BAM
+  sort       Ordena um arquivo BAM
+  index      Cria um índice (.bai) para um BAM ordenado
+  flagstat   Resumo estatístico do mapeamento`,execute:async e=>{let t=e.args[0];t===`view`?(e.print(`r001	163	chr1	7	30	8M2I4M	=	37	39	TTAGATAAAGAGG	*`),e.print(`r002	0	chr1	9	30	3S6M1P1I4M	*	0	0	AAAAGATAAGGATA	*`)):t===`sort`?e.print(`[bam_sort_core] merging from 0 files and 4 in-memory blocks...`):t===`index`?e.print(`[samtools index] successfully generated index.`):t===`flagstat`?e.print(`100000 + 0 in total (QC-passed reads + QC-failed reads)
 0 + 0 secondary
 0 + 0 supplementary
 0 + 0 duplicates
-20000 + 0 mapped (100.00% : N/A)`):e.print(`Program: samtools (Tools for alignments in the SAM format)
-Usage: samtools <command> [options]`)}},{name:`blastn`,description:`Busca de similaridade em sequências de nucleotídeos`,help:`blastn -query ARQUIVO -db DATABASE
+95000 + 0 mapped (95.00% : N/A)`):e.print(`Program: samtools (Tools for alignments in the SAM format)
+Usage: samtools <command> [options]`)}},{name:`picard`,description:`Conjunto de ferramentas para manipular formatos de dados HTS`,help:`picard [Ferramenta] [Opções...]
 
-Realiza busca local de alinhamento de nucleotídeos.`,execute:async e=>{let t=e.args[e.args.indexOf(`-query`)+1];if(!t){e.print(`BLASTN 2.13.0+
-Usage: blastn -query <file> -db <database>`);return}e.print(`Query= ${t}\nLength=150`),e.print(`
-Sequences producing significant alignments:                          E-Value  Bit-score`),e.print(`chr1_segment_A                                                     2e-45    120`),e.print(`chrX_homolog_1                                                     1e-12    56.5`)}},{name:`bedtools`,description:`Suíte de ferramentas para manipulação de arquivos genômicos (BED/GFF/VCF)`,help:`bedtools [SUBCOMANDO] [OPÇÕES]
+Ferramentas em Java para manipular arquivos SAM/BAM/CRAM e VCF.
+
+Exemplo:
+  picard MarkDuplicates I=input.bam O=marked.bam M=metrics.txt`,execute:async e=>{let t=e.args[0];if(!t){e.print(`USAGE: PicardCommandLine <program name> [-h]`);return}e.print(`INFO    2026-04-23 14:10:00     PicardCommandLine       Invoking ${t}`),e.print(`INFO    2026-04-23 14:10:01     ${t}       Start of processing`),await new Promise(e=>setTimeout(e,600)),t===`MarkDuplicates`&&e.print(`INFO    2026-04-23 14:10:05     MarkDuplicates  Read 100000 records. 2000 duplicates found.`),e.print(`INFO    2026-04-23 14:10:06     ${t}       Successfully completed!`)}},{name:`gatk`,description:`Genome Analysis Toolkit (Chamada de variantes e genotipagem)`,help:`gatk [Ferramenta] [Opções]
+
+Desenvolvido pelo Broad Institute, padrão-ouro para análise de variantes em DNA e RNA.`,execute:async e=>{let t=e.args[0]||`HaplotypeCaller`;e.print(`Using GATK jar /usr/local/gatk/gatk-package-4.3.0.0-local.jar`),e.print(`Running: java -Djava.io.tmpdir=/tmp -jar gatk.jar ${t} ${e.args.slice(1).join(` `)}`),e.print(`14:15:00.123 INFO  ${t} - ------------------------------------------------------------`),e.print(`14:15:00.125 INFO  ${t} - The Genome Analysis Toolkit (GATK) v4.3.0.0`),await new Promise(e=>setTimeout(e,1e3)),t===`HaplotypeCaller`&&(e.print(`14:15:20.500 INFO  HaplotypeCaller - 100000 read(s) filtered by: MappingQualityReadFilter`),e.print(`14:15:25.000 INFO  HaplotypeCaller - 5000 active regions processed`)),e.print(`14:15:30.000 INFO  ${t} - Shutting down engine`),e.print(`[23 April 2026 14:15:30] org.broadinstitute.hellbender.tools.${t} done. Elapsed time: 0.50 minutes.`)}},{name:`bcftools`,description:`Utilitários para chamar e manipular arquivos VCF e BCF`,help:`bcftools [COMANDO] [OPÇÕES]
+
+Comandos:
+  mpileup   Gera genótipos probabilísticos
+  call      Faz a chamada de variantes (SNPs/Indels)
+  view      Exibe, filtra e converte arquivos VCF/BCF`,execute:async e=>{let t=e.args[0];t===`mpileup`?e.print(`[mpileup] 1 samples in 1 input files
+[mpileup] maximum number of reads per input file set to -d 250`):t===`call`?e.print(`Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid`):t===`view`?e.print(`##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description="All filters passed">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr1	10000	.	A	G	50.5	PASS	DP=20`):e.print(`Program: bcftools (Tools for variant calling and manipulating VCFs and BCFs)
+Usage: bcftools [--version|--version-only] [--help] <command> <argument>`)}},{name:`freebayes`,description:`Chamador genético de variantes baseado em haplótipos (Bayesiano)`,help:`freebayes -f ref.fa aln.bam > var.vcf
+
+Descobre SNPs, Indels, MNPs e variantes complexas em genomas e populações.`,execute:async e=>{e.print(`##fileformat=VCFv4.2
+##source=freeBayes v1.3.6
+##reference=ref.fa`),e.print(`#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sample1`),e.print(`chr1	15000	.	T	C	1050.2	.	AB=1;DP=40	GT:DP	1/1:40`),e.print(`chr1	15500	.	G	GA	85.5	.	AB=0.5;DP=30	GT:DP	0/1:30`)}},{name:`vcftools`,description:`Ferramentas de análise de arquivos VCF`,help:`vcftools --vcf input.vcf [opções de filtro] --recode
+
+Analisa, filtra e manipula dados de genotipagem em formato VCF.`,execute:async e=>{e.print(`VCFtools - 0.1.16`),e.print(`(C) Adam Auton and Anthony Marcketta 2009`),e.print(`Parameters as interpreted:`),e.print(`	--vcf input.vcf
+	--recode`),await new Promise(e=>setTimeout(e,400)),e.print(`After filtering, kept 1 out of 1 Individuals`),e.print(`After filtering, kept 12500 out of a possible 15000 Sites`),e.print(`Run Time = 1.00 seconds`)}},{name:`snpeff`,description:`Anotação genética e predição de efeitos de variantes`,help:`snpeff [Genoma] variantes.vcf > anotadas.vcf
+
+Anota o impacto das variantes no genoma (ex: missense, nonsense, frameshift).`,execute:async e=>{e.print(`SnpEff version SnpEff 5.1d (build 2022-04-19 15:50)`),e.print(`Reading database for genome version 'GRCh38.105' (this might take a while)...`),await new Promise(e=>setTimeout(e,900)),e.print(`Building interval forest... Done.`),e.print(`Predicting variants effects...`),e.print(`Done.
+Logging...`)}},{name:`spades`,description:`SPAdes: St. Petersburg genome assembler`,help:`spades.py -1 R1.fastq -2 R2.fastq -o output_dir
+
+Montador de genomas de-novo para dados Illumina e IonTorrent/PacBio.`,execute:async e=>{e.print(`SPAdes genome assembler v3.15.5`),e.print(`Command line: spades.py ${e.args.join(` `)}`),e.print(`System information:
+  SPAdes is running on 8 cores`),await new Promise(e=>setTimeout(e,800)),e.print(`===== Assembling started =====`),e.print(`===== K-mer size: 21, 33, 55, 77 =====`),e.print(`===== Assembly finished =====`),e.print(` * Corrected reads are in output_dir/corrected/`),e.print(` * Assembled contigs are in output_dir/contigs.fasta`),e.print(` * Assembled scaffolds are in output_dir/scaffolds.fasta`),e.print(`SPAdes log can be found here: output_dir/spades.log`)}},{name:`megahit`,description:`Montador de-novo ultra-rápido para metagenômica`,help:`megahit -1 R1.fq -2 R2.fq -o out_dir
+
+Otimizado para amostras metagenômicas complexas.`,execute:async e=>{e.print(`MEGAHIT v1.2.9`),e.print(`--- [Mon Apr 23 15:00:00 2026] Start assembly ---`),e.print(`--- [Mon Apr 23 15:00:02 2026] Extracting solid (k+1)-mers ---`),await new Promise(e=>setTimeout(e,600)),e.print(`--- [Mon Apr 23 15:00:15 2026] Assembling contigs ---`),e.print(`--- [Mon Apr 23 15:00:30 2026] Merging to output ---`),e.print(`1500 contigs, total 2500000 bp, min 200 bp, max 55000 bp, avg 1666 bp, N50 18000 bp`),e.print(`--- [Mon Apr 23 15:00:31 2026] ALL DONE. Time elapsed: 31.023 seconds ---`)}},{name:`quast`,description:`Quality Assessment Tool for Genome Assemblies`,help:`quast contigs.fasta -r reference.fasta -o quast_results
+
+Avalia a qualidade de montagens gerando relatórios abrangentes.`,execute:async e=>{e.print(`QUAST started: /usr/local/bin/quast ${e.args.join(` `)}`),e.print(`Version: 5.2.0`),e.print(`System information: OS Linux, 8 CPU(s)`),e.print(`
+Running Basic statistics processor...`),await new Promise(e=>setTimeout(e,500)),e.print(`  Contig files: 1
+  Reference: 1`),e.print(`
+Generating reports...`),e.print(`  HTML report saved to quast_results/report.html`),e.print(`  TXT report saved to quast_results/report.txt`),e.print(`
+Assembly: contigs
+# contigs: 1500
+Total length: 2500000
+Largest contig: 55000
+GC (%): 45.20
+N50: 18000
+L50: 45`)}},{name:`prokka`,description:`Anotação rápida de genomas procariotos`,help:`prokka contigs.fasta --outdir prokka_out
+
+Identifica e anota genes em genomas de bactérias e vírus.`,execute:async e=>{e.print(`[15:10:00] This is prokka 1.14.6`),e.print(`[15:10:00] Looking for 'aragorn' - found /usr/bin/aragorn`),e.print(`[15:10:00] Looking for 'blastp' - found /usr/bin/blastp`),e.print(`[15:10:01] Predicting tRNAs and tmRNAs`),await new Promise(e=>setTimeout(e,700)),e.print(`[15:10:10] Predicting coding sequences`),e.print(`[15:10:15] Annotating CDS, please be patient.`),e.print(`[15:10:20] Found 2300 CDS`),e.print(`[15:10:21] Writing annotation files to prokka_out/`),e.print(`[15:10:22] Annotation finished successfully.`)}},{name:`busco`,description:`Avaliação quantitativa da completude do genoma usando ortólogos de cópia única`,help:`busco -i genome.fasta -o output_name -l bacteria_odb10 -m genome
+
+Avalia a qualidade do genoma ou transcriptoma.`,execute:async e=>{e.print(`INFO:   BUSCO version is: 5.4.4`),e.print(`INFO:   Downloading information on the target lineage bacteria_odb10...`),e.print(`INFO:   Running tblastn on 124 ortholog groups...`),await new Promise(e=>setTimeout(e,900)),e.print(`INFO:   Running HMMER on candidates...`),e.print(`
+C:98.4%[S:98.4%,D:0.0%],F:0.8%,M:0.8%,n:124`),e.print(`    122 Complete BUSCOs (C)`),e.print(`    122 Complete and single-copy BUSCOs (S)`),e.print(`    0   Complete and duplicated BUSCOs (D)`),e.print(`    1   Fragmented BUSCOs (F)`),e.print(`    1   Missing BUSCOs (M)`),e.print(`    124 Total BUSCO groups searched`)}},{name:`salmon`,description:`Quantificação rápida e sensível de expressão de transcritos`,help:`salmon quant -i index -l A -1 R1.fq -2 R2.fq -o transcripts_quant
+
+Quantifica abundância de RNA-seq (mapeamento quase-ótimo).`,execute:async e=>{e.print(`Version Info: This is the most recent version of salmon.`),e.print(`[2026-04-23 15:20:00.123] [jointLog] [info] Fragment incompatibility prior below threshold.`),await new Promise(e=>setTimeout(e,600)),e.print(`[2026-04-23 15:20:05.456] [jointLog] [info] Mapping rate = 85.234%`),e.print(`[2026-04-23 15:20:06.000] [jointLog] [info] Finished quantifying. Output written to directory transcripts_quant/`)}},{name:`kallisto`,description:`Quantificação quase ótima de RNA-seq`,help:`kallisto quant -i index.idx -o output R1.fq R2.fq
+
+Alternativa ao salmon para quantificação ultra-rápida.`,execute:async e=>{e.print(`[quant] fragment length distribution will be estimated from the data`),e.print(`[index] k-mer length: 31`),e.print(`[index] number of targets: 180000`),e.print(`[index] number of k-mers: 105000000`),await new Promise(e=>setTimeout(e,500)),e.print(`[quant] running in paired-end mode`),e.print(`[quant] 1000000 reads processed`),e.print(`[quant] 850000 reads pseudoaligned`)}},{name:`featurecounts`,description:`Programa para atribuir leituras de sequenciamento a regiões genômicas`,help:`featureCounts -a annotation.gtf -o counts.txt input.bam
+
+Conta quantas reads caem dentro de genes/exons.`,execute:async e=>{e.print(`==========     _____ _    _ ____  _____  ______       ==========`),e.print(`==========    / ____| |  | |  _ \\|  __ \\|  ____|      ==========`),e.print(`==========   | (___ | |  | | |_) | |__) | |__         ==========`),e.print(`==========    \\___ \\| |  | |  _ <|  _  /|  __|        ==========`),e.print(`==========    ____) | |__| | |_) | | \\ \\| |____       ==========`),e.print(`==========   |_____/ \\____/|____/|_|  \\_\\______| v2.0.3 ==========`),e.print(`
+//========================== featureCounts setting ===========================\\\\`),e.print(`||             Input files : 1 BAM file                                       ||`),e.print(`||             Annotation : annotation.gtf (GTF)                              ||`),e.print(`\\\\============================================================================//`),await new Promise(e=>setTimeout(e,600)),e.print(`
+//================================= Summary ==================================\\\\`),e.print(`|| Total alignments : 1000000                                                 ||`),e.print(`|| Successfully assigned alignments : 820000 (82.0%)                          ||`),e.print(`|| Running time : 0.25 minutes                                                ||`),e.print(`\\\\============================================================================//`)}},{name:`kraken2`,description:`Classificação taxonômica rápida usando k-mers exatos`,help:`kraken2 --db database --report report.txt --paired R1.fq R2.fq
+
+Atribui reads a táxons usando um banco de dados de referência.`,execute:async e=>{e.print(`Loading database information... done.`),e.print(`1000000 sequences (150.00 Mbp) processed in 5.250s (11.4 Kseq/m, 1.72 Mbp/m).`),e.print(`  850000 sequences classified (85.00%)`),e.print(`  150000 sequences unclassified (15.00%)`)}},{name:`bracken`,description:`Bayesian Reestimation of Abundance with KrakEN`,help:`bracken -d database -i kraken_report.txt -o bracken_out.txt
+
+Estima a abundância relativa em amostras metagenômicas a partir de resultados do Kraken.`,execute:async e=>{e.print(`>> Checking provided report file...`),e.print(`>> Filtering taxonomic classifications...`),e.print(`>> Estimating species-level abundances...`),await new Promise(e=>setTimeout(e,400)),e.print(`>> Writing Bracken output to bracken_out.txt...`),e.print(`Bracken complete.`)}},{name:`seqtk`,description:`Ferramenta rápida e leve para processamento de sequências (FASTA/Q)`,help:`seqtk [COMANDO] [OPÇÕES]
+
+Comandos úteis:
+  seq      formata e transforma sequências
+  sample   amostra aleatoriamente sequências
+  subseq   extrai sequências baseado em nomes`,execute:async e=>{let t=e.args[0];t===`sample`?e.print(`@read_1_sampled
+ACGTACGTACGT
++
+IIIIIIIIIIII`):t===`seq`?e.print(`>seq1
+ACGTACGTACGT`):e.print(`Usage: seqtk <command> <arguments>
+Command:
+  seq       common transformation of FASTA/Q
+  comp      get the nucleotide composition of FASTA/Q
+  sample    subsample sequences
+  subseq    extract subsequences from FASTA/Q`)}},{name:`seqkit`,description:`Canivete suíço multiplataforma e ultra-rápido para FASTA/Q`,help:`seqkit [COMANDO] [OPÇÕES]
+
+Ferramenta em Go, muito mais rica em opções que seqtk.
+
+Comandos úteis:
+  stats    Estatísticas simples
+  grep     Busca sequências por ID ou motivo`,execute:async e=>{let t=e.args[0];t===`stats`?(e.print(`file       format  type  num_seqs  sum_len  min_len  avg_len  max_len`),e.print(`reads.fq   FASTQ   DNA   100,000   15.0M    150      150      150`)):t===`grep`?e.print(`>matched_seq
+ATGCGTACGTG`):e.print(`seqkit - a cross-platform and ultrafast toolkit for FASTA/Q file manipulation
+Usage:
+  seqkit [command]`)}},{name:`makeblastdb`,description:`Cria bancos de dados locais para o BLAST`,help:`makeblastdb -in ref.fa -dbtype nucl -out mydb
+
+Indexa um arquivo FASTA para buscas rápidas pelo BLAST.`,execute:async e=>{e.print(`Building a new DB, current time: 04/23/2026 15:30:00`),e.print(`New DB name:   /home/dayhoff/mydb`),e.print(`New DB title:  ref.fa`),e.print(`Sequence type: Nucleotide`),await new Promise(e=>setTimeout(e,400)),e.print(`Adding sequences from FASTA; added 5000 sequences in 0.25 seconds.`)}},{name:`blastn`,description:`Busca de similaridade em sequências de nucleotídeos`,help:`blastn -query ARQUIVO -db DATABASE
+
+Realiza busca local de alinhamento de nucleotídeos.`,execute:async e=>{let t=e.args[e.args.indexOf(`-query`)+1]||`query.fa`;e.print(`BLASTN 2.13.0+\nQuery= ${t}\nLength=150`),e.print(`
+Sequences producing significant alignments:                          E-Value  Bit-score`),e.print(`chr1_segment_A                                                     2e-45    120`),e.print(`chrX_homolog_1                                                     1e-12    56.5`)}},{name:`blastp`,description:`Busca de similaridade em sequências de proteínas`,help:`blastp -query ARQUIVO -db DATABASE
+
+Compara uma proteína query com um banco de proteínas.`,execute:async e=>{let t=e.args[e.args.indexOf(`-query`)+1]||`protein.faa`;e.print(`BLASTP 2.13.0+\nQuery= ${t}\nLength=300 amino acids`),e.print(`
+Sequences producing significant alignments:                          E-Value  Bit-score`),e.print(`sp|P12345|KIN1_HUMAN Kinase 1                                      0.0      600`),e.print(`sp|Q67890|KIN2_MOUSE Kinase 2                                      1e-50    150`)}},{name:`blastx`,description:`Busca de similaridade de nucleotídeo (traduzido) contra proteína`,help:`blastx -query ARQUIVO -db DATABASE
+
+Traduz o nucleotídeo nas 6 janelas de leitura contra um banco de proteínas.`,execute:async e=>{let t=e.args[e.args.indexOf(`-query`)+1]||`transcript.fa`;e.print(`BLASTX 2.13.0+\nQuery= ${t}\nLength=450`),e.print(`
+Sequences producing significant alignments:                          E-Value  Bit-score`),e.print(`sp|P12345|KIN1_HUMAN Kinase 1                                      1e-80    280`)}},{name:`bedtools`,description:`Suíte de ferramentas para manipulação de arquivos genômicos (BED/GFF/VCF)`,help:`bedtools [SUBCOMANDO] [OPÇÕES]
 
 Operações aritméticas genômicas.
 
