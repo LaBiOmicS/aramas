@@ -92,28 +92,80 @@ export class VFSManager {
           modifiedAt: Date.now(),
           content: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y samtools\nCMD ["samtools"]',
         },
+        '/home/dayhoff/lista.txt': {
+          name: 'lista.txt',
+          type: 'file',
+          parent: '/home/dayhoff',
+          permissions: 'rw-r--r--',
+          owner: 'dayhoff',
+          group: 'dayhoff',
+          createdAt: Date.now(),
+          modifiedAt: Date.now(),
+          content: 'maçã\nbanana\nmaçã\nlaranja\nbanana\nuva',
+        },
+        '/home/dayhoff/ref.fa': {
+          name: 'ref.fa',
+          type: 'file',
+          parent: '/home/dayhoff',
+          permissions: 'rw-r--r--',
+          owner: 'dayhoff',
+          group: 'dayhoff',
+          createdAt: Date.now(),
+          modifiedAt: Date.now(),
+          content: '>chr1\nATGCATGCATGCATGCATGCATGC\n>chr2\nGGGGCCCCAAAATTTTGGGGCCCC',
+        },
+        '/home/dayhoff/reads.fq': {
+          name: 'reads.fq',
+          type: 'file',
+          parent: '/home/dayhoff',
+          permissions: 'rw-r--r--',
+          owner: 'dayhoff',
+          group: 'dayhoff',
+          createdAt: Date.now(),
+          modifiedAt: Date.now(),
+          content: '@read1\nATGCATGC\n+\nIIIIIIII\n@read2\nGGGGCCCC\n+\nIIIIIIII',
+        },
+        '/home/dayhoff/arq1': {
+          name: 'arq1',
+          type: 'file',
+          parent: '/home/dayhoff',
+          permissions: 'rw-r--r--',
+          owner: 'dayhoff',
+          group: 'dayhoff',
+          createdAt: Date.now(),
+          modifiedAt: Date.now(),
+          content: 'linha 1\nlinha 2\nlinha 3',
+        },
+        '/home/dayhoff/arq2': {
+          name: 'arq2',
+          type: 'file',
+          parent: '/home/dayhoff',
+          permissions: 'rw-r--r--',
+          owner: 'dayhoff',
+          group: 'dayhoff',
+          createdAt: Date.now(),
+          modifiedAt: Date.now(),
+          content: 'linha 1\nlinha modificada\nlinha 3\nlinha nova',
+        },
       },
       cwd: '/home/dayhoff',
     };
     
-    // Ensure children are correctly linked - Defensivo para evitar crash com localStorage antigo
-    const homeDayhoff = this.state.nodes['/home/dayhoff'] as DirectoryNode;
-    if (homeDayhoff && homeDayhoff.children) {
-      if (!homeDayhoff.children.includes('projetos')) {
-        homeDayhoff.children.push('projetos');
+    // Atualiza dinamicamente os filhos de cada diretório baseado nos nós existentes
+    Object.keys(this.state.nodes).forEach(path => {
+      const node = this.state.nodes[path];
+      if (node.parent && this.state.nodes[node.parent]) {
+        const parentNode = this.state.nodes[node.parent] as DirectoryNode;
+        if (!parentNode.children.includes(node.name)) {
+          parentNode.children.push(node.name);
+        }
       }
-    }
-    
-    const projetos = this.state.nodes['/home/dayhoff/projetos'] as DirectoryNode;
-    if (projetos) {
-      projetos.children = ['sequencia.fasta', 'genoma_curto.seq'];
-    }
+    });
 
-    const home = this.state.nodes['/home'] as DirectoryNode;
-    if (home && home.children) {
-      if (!home.children.includes('dayhoff')) {
-        home.children.push('dayhoff');
-      }
+    // Link fixo para os diretórios raiz caso tenham sido perdidos
+    const root = this.state.nodes['/'] as DirectoryNode;
+    if (root) {
+      root.children = ['home', 'bin', 'etc', 'tmp', 'var', 'usr', 'root'];
     }
   }
 
@@ -159,6 +211,10 @@ export class VFSManager {
   }
 
   public resolvePath(path: string): string {
+    if (path === '~') return '/home/dayhoff';
+    if (path.startsWith('~/')) {
+      return this.normalizePath('/home/dayhoff/' + path.substring(2));
+    }
     if (path.startsWith('/')) {
       return this.normalizePath(path);
     }
@@ -179,11 +235,12 @@ export class VFSManager {
       }
     }
 
-    return '/' + stack.join('/');
+    const result = '/' + stack.join('/');
+    return result === '' ? '/' : result;
   }
 
   public getNode(path: string): VFSNode | null {
-    const normalized = this.normalizePath(path);
+    const normalized = this.resolvePath(path);
     return this.state.nodes[normalized] || null;
   }
 
@@ -307,7 +364,8 @@ export class VFSManager {
     const parentPath = node.parent || '/';
     if (!this.checkPermission(parentPath, user, 'w')) return false;
 
-    if (node.type === 'directory' && !recursive && node.children.length > 0) {
+    if (node.type === 'directory' && !recursive) {
+      // No Linux, rm não apaga diretórios sem -r, nem mesmo se estiverem vazios
       return false;
     }
 

@@ -150,7 +150,13 @@ export const basicCommands: Command[] = [
 
       for (const path of paths) {
         const node = ctx.vfs.getNode(path);
-        if (node && node.type === 'directory' && !recursive) {
+        
+        if (!node) {
+          if (!force) ctx.printError(`rm: não foi possível remover '${path}': Arquivo ou diretório inexistente`);
+          continue;
+        }
+
+        if (node.type === 'directory' && !recursive) {
           ctx.printError(`rm: não foi possível remover '${path}': É um diretório`);
           continue;
         }
@@ -158,7 +164,7 @@ export const basicCommands: Command[] = [
         if (ctx.vfs.rm(path, ctx.user, recursive)) {
           if (verbose) ctx.print(`removido '${path}'`);
         } else {
-          if (!force) ctx.printError(`rm: não foi possível remover '${path}': Permissão negada ou diretório não vazio`);
+          if (!force) ctx.printError(`rm: não foi possível remover '${path}': Permissão negada`);
         }
       }
     }
