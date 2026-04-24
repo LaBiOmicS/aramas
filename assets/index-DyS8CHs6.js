@@ -124,111 +124,58 @@ DESCRIÇÃO: Lista informações sobre os ARQUIVOS.`,chmod:`CHMOD(1) - altera pe
 
 SINOPSE: chmod [OPÇÃO]... MODO[,MODO]... ARQUIVO...`,sbatch:`SBATCH(1) - envia um script de lote para o Slurm
 
-SINOPSE: sbatch [OPÇÕES] SCRIPT`}[t]||`Nenhuma entrada de manual para ${t}`)}},{name:`du`,description:`Estima o uso de espaço de arquivos`,help:`du [OPÇÃO]... [ARQUIVO]...
+SINOPSE: sbatch [OPÇÕES] SCRIPT`}[t]||`Nenhuma entrada de manual para ${t}`)}},{name:`sudo`,description:`Executa um comando como superusuário (root)`,help:`sudo COMANDO [ARGUMENTOS]
 
-Exibe o uso de disco de cada arquivo e diretório.
+Permite que usuários comuns executem comandos com privilégios de administrador.`,execute:async e=>{e.args.length===0&&e.print(`Uso: sudo [comando]`)}},{name:`history`,description:`Exibe a lista de comandos executados anteriormente`,help:`history
 
-Opções:
-  -h, --human-readable   tamanhos em formato legível (ex: 1K 234M 2G)
-  -s, --summarize        exibe apenas o total para cada argumento`,execute:async e=>{let t=e.args.includes(`-h`)||e.args.includes(`--human-readable`),n=e.args.includes(`-s`)||e.args.includes(`--summarize`),r=e.args.find(e=>!e.startsWith(`-`))||`.`;n?e.print(`${t?`452M`:`462848`}\t${r}`):(e.print(`${t?`12K`:`12`}\t${r}/config`),e.print(`${t?`440M`:`450560`}\t${r}/data`),e.print(`${t?`452M`:`462848`}\t${r}`))}},{name:`vim`,description:`Vi IMproved, um editor de texto para programadores`,help:`vim [ARQUIVO]
-
-Inicia o editor de texto Vim. (Simulação visual)`,execute:async e=>{let t=e.args[0]||`[Novo Arquivo]`;e.clear();for(let n=0;n<20;n++)n===0?e.print(`\x1B[1;34m~   \x1B[0mBem-vindo ao Vim (Simulação)`):n===1?e.print(`\x1b[1;34m~   \x1b[0mArquivo: ${t}`):e.print(`\x1B[1;34m~\x1B[0m`);e.print(`\x1b[7m"${t}" 0L, 0C                              1,1           Tudo\x1b[0m`),e.print(`\x1B[1;30m(Pressione 'Ctrl+C' ou digite ':q' no prompt real para sair da simulação)\x1B[0m`)}},{name:`sbatch`,description:`Envia um script de lote para o Slurm`,help:`sbatch [OPÇÕES] SCRIPT
-
-Envia um script para execução no cluster.
-
-Exemplo:
-  sbatch pipeline.sh`,execute:async e=>{if(!e.args[0]){e.printError(`sbatch: erro: nenhum script especificado`);return}let t=Math.floor(Math.random()*9e5)+1e5;e.print(`Submitted batch job ${t}`)}},{name:`squeue`,description:`Exibe a fila de jobs do Slurm`,help:`squeue [OPÇÕES]
+Mostra o histórico de comandos da sessão atual.`,execute:async e=>{e.print(`  1  ls -la
+  2  cd /home/dayhoff
+  3  mkdir analise
+  4  history`)}},{name:`wc`,description:`Imprime contagem de linhas, palavras e bytes`,help:`wc [OPÇÃO]... [ARQUIVO]...
 
 Opções:
-  -u [user]   Lista apenas jobs do usuário`,execute:async e=>{e.print(`             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)`);let t=Math.floor(Math.random()*9e5)+1e5;e.print(`${t}     batch   pipeline  dayhoff  R       0:15      1 node-01`),e.print(`${t+1}     batch   analysis  dayhoff  PD      0:00      1 (Resources)`)}},{name:`sinfo`,description:`Exibe informações sobre os nós e partições do Slurm`,help:`sinfo
+  -l, --lines    exibe o número de linhas
+  -w, --words    exibe o número de palavras`,execute:async e=>{e.print(`      10      45     320 ${e.args[0]||``}`)}},{name:`uptime`,description:`Informa há quanto tempo o sistema está ligado`,help:`uptime
 
-Exibe o estado dos recursos do cluster.`,execute:async e=>{e.print(`PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST`),e.print(`batch*       up   infinite      8   idle node-[01-08]`),e.print(`gpu          up   infinite      2   busy node-09,node-10`)}},{name:`scancel`,description:`Cancela jobs no Slurm`,help:`scancel JOBID
+Exibe a hora atual, tempo de atividade e carga média do sistema.`,execute:async e=>{e.print(` 14:30:05 up 2 days,  4:12,  1 user,  load average: 0.05, 0.02, 0.01`)}},{name:`ssh`,description:`Cliente de login remoto OpenSSH`,help:`ssh [USUÁRIO@]HOST
 
-Exemplo:
-  scancel 123456`,execute:async e=>{let t=e.args[0];if(!t){e.printError(`scancel: erro: JOBID necessário`);return}e.print(`Job ${t} cancelled.`)}},{name:`chmod`,description:`Altera as permissões de acesso a arquivos`,help:`chmod [OPÇÃO]... MODO[,MODO]... ARQUIVO...
+Conecta-se a um servidor remoto de forma segura.`,execute:async e=>{if(!e.args[0]){e.print(`Uso: ssh usuario@host`);return}e.print(`Conectando-se a ${e.args[0]}...\nSSH connection established.`)}},{name:`groups`,description:`Exibe os grupos aos quais o usuário pertence`,help:`groups [USUÁRIO]
 
-Modifica as permissões de cada ARQUIVO de acordo com MODO.
+Exibe os nomes dos grupos aos quais o usuário atual ou especificado pertence.`,execute:async e=>{e.print(e.user===`root`?`root`:`dayhoff sudo bioinfo labiomics`)}},{name:`id`,description:`Exibe os IDs de usuário e grupo`,help:`id [USUÁRIO]
 
-Opções:
-  -R, --recursive        modifica arquivos e diretórios recursivamente
-  -v, --verbose          exibe um diagnóstico para cada arquivo processado
-
-Exemplos:
-  chmod 755 script.sh
-  chmod u+x,g-w arquivo.txt`,execute:async e=>{if(e.args.length<2){e.printError(`chmod: operando ausente`);return}let t=e.args.find(e=>!e.startsWith(`-`)),n=e.args.find(e=>!e.startsWith(`-`)&&e!==t);n&&e.vfs.chmod(n,t||`644`,e.user)?e.args.includes(`-v`)&&e.print(`o modo de '${n}' foi alterado para ${t}`):e.printError(`chmod: não foi possível acessar '${n}': Arquivo não encontrado`)}},{name:`chown`,description:`Altera o dono e o grupo de arquivos`,help:`chown [OPÇÃO]... [DONO][:[GRUPO]] ARQUIVO...
-
-Altera o proprietário e/ou grupo de cada ARQUIVO.
+Exibe informações de UID (usuário) e GID (grupo) reais e efetivos.`,execute:async e=>{e.print(e.user===`root`?`uid=0(root) gid=0(root) grupos=0(root)`:`uid=1000(dayhoff) gid=1000(dayhoff) grupos=1000(dayhoff),27(sudo),1001(labiomics)`)}},{name:`du`,description:`Estima o uso de espaço de arquivos`,help:`du [OPÇÃO]... [ARQUIVO]...
 
 Opções:
-  -R, --recursive        opera em arquivos e diretórios recursivamente
+  -h, --human-readable   tamanhos legíveis
+  -s, --summarize        exibe apenas o total`,execute:async e=>{let t=e.args.includes(`-h`);e.print(`${t?`452M`:`462848`}\t${e.args.find(e=>!e.startsWith(`-`))||`.`}`)}},{name:`vim`,description:`Editor de texto visual para programadores`,help:`vim [ARQUIVO]
 
-Exemplo:
-  chown root:root /etc/passwd`,execute:async e=>{if(e.args.length<2){e.printError(`chown: operando ausente`);return}let t=e.args.find(e=>!e.startsWith(`-`)),n=e.args.find(e=>!e.startsWith(`-`)&&e!==t);n&&e.vfs.chown(n,t?.split(`:`)[0]||`root`,e.user)?e.print(`Propriedade de '${n}' alterada.`):e.printError(`chown: alteração falhou para '${n}'`)}},{name:`ps`,description:`Relatório do status dos processos atuais`,help:`ps [OPÇÕES]
+Inicia a simulação do editor Vim. Use :q para sair.`,execute:async e=>{e.clear(),e.print(`\x1b[1;34m~\x1b[0m\n\x1b[1;34m~\x1b[0m   VIM - Vi IMproved\n\x1b[1;34m~\x1b[0m   Simulação para aprendizado\n\x1b[1;34m~\n\x1b[7m"${e.args[0]||`[Novo]`}" 0L, 0C                          1,1           Tudo\x1b[0m`)}},{name:`sbatch`,description:`Envia um script de lote para o Slurm`,help:`sbatch [OPÇÕES] SCRIPT
 
-Exibe informações sobre os processos ativos.
+Envia um script para execução no cluster HPC.`,execute:async e=>{if(!e.args[0]){e.printError(`sbatch: erro: nenhum script especificado`);return}e.print(`Submitted batch job ${Math.floor(Math.random()*9e5)+1e5}`)}},{name:`squeue`,description:`Exibe a fila de jobs do Slurm`,help:`squeue
 
-Opções:
-  aux      exibe todos os processos de todos os usuários
-  -ef      exibe todos os processos em formato completo
-  --tree   exibe processos em formato de árvore`,execute:async e=>{e.args.includes(`aux`)?(e.print(`USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND`),e.print(`root         1  0.0  0.1  168M  9612 ?        Ss   Apr22   0:02 /sbin/init`),e.print(`dayhoff    124  0.1  0.5  543M 42100 pts/0    Ss   12:00   0:01 /bin/bash`),e.print(`dayhoff    567  0.0  0.0  123M  2100 pts/0    R+   12:35   0:00 ps aux`)):e.args.includes(`-ef`)?(e.print(`UID        PID  PPID  C STIME TTY          TIME CMD`),e.print(`root         1     0  0 Apr22 ?        00:00:02 /sbin/init`),e.print(`dayhoff    124     1  0 12:00 pts/0    00:00:01 /bin/bash`)):e.print(`  PID TTY          TIME CMD
-  124 pts/0    00:00:01 bash
-  568 pts/0    00:00:00 ps`)}},{name:`top`,description:`Exibe processos do Linux de forma dinâmica`,help:`top
+Lista todos os jobs em execução ou pendentes no cluster.`,execute:async e=>{e.print(`             JOBID PARTITION     NAME     USER ST       TIME  NODES
+123456     batch   align     dayhoff  R       5:12      1`)}},{name:`sinfo`,description:`Exibe informações sobre os nós do cluster Slurm`,help:`sinfo
 
-Exibe uma visão em tempo real dos processos do sistema.`,execute:async e=>{e.print(`\x1B[H\x1B[Jtop - 12:35:42 up 1 day, 2:31,  1 user,  load average: 0.08, 0.03, 0.05`),e.print(`Tasks: 125 total,   1 running, 124 sleeping,   0 stopped,   0 zombie`),e.print(`%Cpu(s):  0.3 us,  0.3 sy,  0.0 ni, 99.3 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st`),e.print(`MiB Mem :   7956.1 total,   3124.5 free,   2456.8 used,   2374.8 buff/cache`),e.print(`
-  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND`),e.print(`  124 dayhoff   20   0  543200  42100  32400 S   0.3   0.5   0:01.45 bash`),e.print(`  569 dayhoff   20   0   12345   6789   1234 R   0.0   0.1   0:00.01 top`)}},{name:`free`,description:`Exibe quantidade de memória livre e usada`,help:`free [OPÇÃO]
+Exibe o estado e disponibilidade das partições e nós do cluster.`,execute:async e=>{e.print(`PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+batch*       up   infinite      8   idle node-[01-08]`)}},{name:`scancel`,description:`Cancela jobs no Slurm`,help:`scancel JOBID
 
-Exibe a quantidade total de memória física e de swap livre e usada.
+Interrompe um job em execução no cluster.`,execute:async e=>{e.args[0]&&e.print(`Job ${e.args[0]} cancelled.`)}},{name:`top`,description:`Exibe processos do Linux de forma dinâmica`,help:`top
 
-Opções:
-  -h, --human   exibe em formato legível (GB, MB)
-  -m, --mega    exibe em megabytes`,execute:async e=>{let t=e.args.includes(`-h`);e.print(`              total        used        free      shared  buff/cache   available`),t?(e.print(`Mem:           7.8G        2.4G        3.1G        100M        2.3G        5.1G`),e.print(`Swap:          2.0G          0B        2.0G`)):(e.print(`Mem:        8192000     2048000     4096000      102400     2048000     6144000`),e.print(`Swap:       2048000           0     2048000`))}},{name:`ip`,description:`Exibe ou manipula roteamento, dispositivos e interfaces`,help:`ip [OPÇÕES] OBJETO {COMANDO}
+Visão em tempo real dos processos e recursos do sistema.`,execute:async e=>{e.print(`\x1B[H\x1B[Jtop - 14:35:00 up 2 days
+Tasks: 120 total, 1 running
+%Cpu(s): 0.5 us, 0.2 sy
+MiB Mem: 8192 total, 4096 free
 
-Objetos:
-  address (a)    endereços IP nas interfaces
-  link (l)       dispositivos de rede
-  route (r)      tabela de roteamento
-
-Exemplos:
-  ip addr show
-  ip link set eth0 up`,execute:async e=>{let t=e.args[0];t===`addr`||t===`a`?e.print(`1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    inet 127.0.0.1/8 scope host lo
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default
-    link/ether 52:54:00:12:34:56 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.1.10/24 brd 192.168.1.255 scope global dynamic eth0`):t===`link`||t===`l`?e.print(`1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 state UNKNOWN
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 state UP`):e.print(`Usage: ip [ OPTIONS ] OBJECT { COMMAND | help }`)}},{name:`netstat`,description:`Exibe conexões de rede e estatísticas`,help:`netstat [OPÇÕES]
+  PID USER      PR  NI    VIRT    RES  S  %CPU  %MEM     TIME+ COMMAND
+  124 dayhoff   20   0  543200  42100  S   0.5   0.5   0:05.12 bash`)}},{name:`free`,description:`Exibe quantidade de memória livre e usada`,help:`free [OPÇÃO]
 
 Opções:
-  -a, --all        exibe todos os sockets
-  -t               exibe conexões TCP
-  -u               exibe conexões UDP
-  -l               exibe sockets em escuta
-  -p               exibe o PID/Nome do programa`,execute:async e=>{e.print(`Active Internet connections (only servers)
-Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name`),e.print(`tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      842/nginx: master`),e.print(`tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      711/sshd`),e.print(`udp        0      0 0.0.0.0:68              0.0.0.0:*                           620/dhclient`)}},{name:`df`,description:`Relata o uso de espaço em disco`,help:`df [OPÇÃO]... [ARQUIVO]...
+  -h, --human   formato legível`,execute:async e=>{e.print(`              total        used        free
+Mem:           7.8G        2.4G        3.1G`)}},{name:`lsblk`,description:`Lista dispositivos de bloco`,help:`lsblk
 
-Opções:
-  -h, --human-readable   exibe tamanhos em formato legível (ex: 1K 234M 2G)
-  -T, --print-type       exibe o tipo do sistema de arquivos`,execute:async e=>{let t=e.args.includes(`-h`);e.print(`Sist. Arq.      Tam.   Usado  Disp. Uso% Montado em`),t?(e.print(`/dev/sda1        50G    12G    38G  24% /`),e.print(`tmpfs           3.9G     0G   3.9G   0% /dev/shm`)):(e.print(`/dev/sda1   52428800 12582912 39845888  24% /`),e.print(`tmpfs        40894464        0 40894464   0% /dev/shm`))}},{name:`nmap`,description:`Exploração de rede e scanner de segurança`,help:`nmap [Tipo de Scan] [Opções] {alvo}
-
-Exemplos:
-  nmap localhost
-  nmap -p 80,443 192.168.1.1`,execute:async e=>{let t=e.args.find(e=>!e.startsWith(`-`))||`localhost`;e.print(`Starting Nmap 7.93 at ${new Date().toISOString()}`),e.print(`Nmap scan report for ${t} (127.0.0.1)\nHost is up (0.00004s latency).`),e.print(`PORT     STATE SERVICE
-22/tcp   open  ssh
-80/tcp   open  http
-443/tcp  open  https
-3306/tcp open  mysql`),e.print(`
-Nmap done: 1 IP address (1 host up) scanned in 0.05 seconds`)}},{name:`mem`,description:`Alias para free -h`,help:`mem
-
-Exibe informações de memória em formato legível.`,execute:async e=>{let t=cc.find(e=>e.name===`free`);t&&await t.execute({...e,args:[`-h`]})}},{name:`nslookup`,description:`Consulta servidores de nomes de domínio interativamente`,help:`nslookup [HOST]
-
-Exemplo:
-  nslookup google.com`,execute:async e=>{let t=e.args[0]||`google.com`;e.print(`Server:         127.0.0.53\nAddress:        127.0.0.53#53\n\nNon-authoritative answer:\nName:   ${t}\nAddress: 142.250.191.46`)}},{name:`dig`,description:`Utilitário de busca DNS`,help:`dig [HOST]
-
-Exemplo:
-  dig labiomics.com`,execute:async e=>{let t=e.args[0]||`example.com`;e.print(`; <<>> DiG 9.18.12 <<>> ${t}\n;; global options: +cmd\n;; Got answer:\n;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 12345\n\n;; ANSWER SECTION:\n${t}.   300 IN  A   93.184.216.34`)}},{name:`lsblk`,description:`Lista dispositivos de bloco`,help:`lsblk [OPÇÕES]
-
-Lista informações sobre todos os dispositivos de bloco disponíveis.`,execute:async e=>{e.print(`NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS`),e.print(`sda      8:0    0    50G  0 disk 
-└─sda1   8:1    0    50G  0 part /`),e.print(`sr0     11:0    1  1024M  0 rom`)}}],lc=[{name:`bio-count`,description:`Conta a frequência de bases (A, T, C, G) em uma sequência ou arquivo`,help:`bio-count [SEQUÊNCIA | ARQUIVO]
+Exibe informações sobre discos e partições.`,execute:async e=>{e.print(`NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+sda      8:0    0    50G  0 disk 
+└─sda1   8:1    0    50G  0 part /`)}}],lc=[{name:`bio-count`,description:`Conta a frequência de bases (A, T, C, G) em uma sequência ou arquivo`,help:`bio-count [SEQUÊNCIA | ARQUIVO]
 
 Calcula a frequência de nucleotídeos, total de pares de bases e conteúdo GC.
 Se o argumento for um arquivo existente, lê o arquivo; caso contrário, processa a string fornecida.`,execute:async e=>{let t=e.args[0];if(!t){e.printError(`Uso: bio-count [sequência ou arquivo]`);return}let n=(e.vfs.readFile(t)||t).toUpperCase(),r={A:0,T:0,C:0,G:0,N:0};for(let e of n)r[e]===void 0?/[A-Z]/.test(e)&&r.N++:r[e]++;e.print(`\x1B[1;32mRelatório de Sequência:\x1B[0m`),e.print(`  A: ${r.A}\n  T: ${r.T}\n  C: ${r.C}\n  G: ${r.G}`),r.N>0&&e.print(`  Outros/N: ${r.N}`);let i=r.A+r.T+r.C+r.G+r.N,a=i>0?((r.G+r.C)/(r.A+r.T+r.C+r.G)*100).toFixed(2):`0.00`;e.print(`  Total: ${i} bp\n  Conteúdo GC: ${a}%`)}},{name:`bio-rev-comp`,description:`Gera o complemento reverso de uma sequência de DNA`,help:`bio-rev-comp [SEQUÊNCIA | ARQUIVO]
@@ -384,239 +331,48 @@ Subcomandos comuns:
   intersect   Encontra sobreposições entre arquivos`,execute:async e=>{e.args[0]===`intersect`?e.print(`chr1	100	200	geneA	chr1	150	250	exon1`):e.print(`bedtools: a powerful toolset for genome arithmetic.
 Usage: bedtools <subcommand> [options]`)}}],uc=[{name:`wget`,description:`O recuperador de arquivos não interativo`,help:`wget URL
 
-Simula o download de um arquivo a partir de uma URL.`,execute:async e=>{let t=e.args[0];if(!t){e.printError(`wget: URL ausente`);return}e.print(`--${new Date().toISOString()}--  ${t}`),e.print(`Resolvendo host... OK`),e.print(`Conectando... OK`),e.print(`Requisição HTTP enviada, aguardando resposta... 200 OK`),e.print(`Comprimento: 1024000 (1000K) [application/octet-stream]`),e.print(`Salvando em: '${t.split(`/`).pop()||`index.html`}'\n`),e.print(` 0% [                                     ] 0          --.-K/s`),await new Promise(e=>setTimeout(e,600)),e.print(`100% [====================================>] 1,024,000  2.5MB/s   em 0.4s`)}},{name:`curl`,description:`Transfere dados de ou para um servidor`,help:`curl [OPÇÃO]... URL
-
-Simula a transferência de dados de um servidor.
+Simula o download de um arquivo a partir de uma URL.`,execute:async e=>{let t=e.args[0];if(!t){e.printError(`wget: URL ausente`);return}e.print(`--${new Date().toISOString()}--  ${t}\nConectando... OK\nRequisição HTTP enviada, aguardando resposta... 200 OK\nSalvando em: '${t.split(`/`).pop()||`index.html`}'`)}},{name:`curl`,description:`Transfere dados de ou para um servidor`,help:`curl [OPÇÃO]... URL
 
 Opções:
-  -I, --head    exibe apenas os cabeçalhos da resposta`,execute:async e=>{let t=e.args.includes(`-I`)||e.args.includes(`--head`),n=e.args.find(e=>!e.startsWith(`-`));if(!n){e.printError(`curl: use --help para mais informações`);return}t?e.print(`HTTP/1.1 200 OK
-Date: Thu, 23 Apr 2026 12:00:00 GMT
-Content-Type: text/html; charset=UTF-8
-Server: gws`):(e.print(`  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current`),e.print(`                                 Dload  Upload   Total   Spent    Left  Speed`),e.print(`100 1024k  100 1024k    0     0  2500k      0 --:--:-- --:--:-- --:--:-- 2500k`),e.print(`<html><body>Simulando resposta de ${n}</body></html>`))}},{name:`tar`,description:`Utilitário de arquivamento`,help:`tar [OPÇÃO]... [ARQUIVO]...
-
-Suite de arquivamento.
+  -I, --head    exibe apenas os cabeçalhos da resposta
+  -v, --verbose torna a operação detalhada`,execute:async e=>{let t=e.args.find(e=>!e.startsWith(`-`));if(!t){e.printError(`curl: use --help para mais informações`);return}e.args.includes(`-v`)&&e.print(`*   Trying 127.0.0.1:80...\n* Connected to ${t} port 80`),e.print(`<html><body>Simulando resposta de ${t}</body></html>`)}},{name:`tar`,description:`Utilitário de arquivamento`,help:`tar [OPÇÃO]... [ARQUIVO]...
 
 Opções:
   -c           cria um novo arquivo
-  -x           extrai arquivos de um arquivo
-  -v           exibe a lista de arquivos processados
-  -z           filtra o arquivo através do gzip
-  -f           especifica o nome do arquivo`,execute:async e=>{let t=e.args.some(e=>e.includes(`v`)),n=e.args.some(e=>e.includes(`z`)),r=e.args.some(e=>e.includes(`j`)),i=e.args.some(e=>e.includes(`x`)),a=e.args.some(e=>e.includes(`c`)),o=e.args.find(e=>!e.startsWith(`-`))||`archive.tar`;a?(t&&e.print(`a bin/
-a etc/
-a home/`),e.print(`Arquivado com sucesso em ${o}${n?`.gz`:r?`.bz2`:``}`)):i?(t&&e.print(`x bin/
-x etc/
-x home/`),e.print(`Extraído com sucesso de ${o}`)):e.print(`Uso: tar [-czjvf] [arquivo]`)}},{name:`zip`,description:`Empacota e comprime (arquiva) arquivos`,help:`zip ARQUIVO_DESTINO ARQUIVO_ORIGEM...
+  -x           extrai arquivos
+  -v           detalhado
+  -z           comprime com gzip
+  -f           especifica o arquivo`,execute:async e=>{e.print(`Arquivado com sucesso.`)}},{name:`sed`,description:`Editor de fluxo para filtrar e transformar texto`,help:`sed EXPRESSÃO [ARQUIVO]
 
-Comprime arquivos no formato .zip.`,execute:async e=>{let t=e.args.find(e=>!e.startsWith(`-`));if(!t){e.printError(`zip error: Nothing to do!`);return}e.print(`  adding: ${t} (deflated 15%)`)}},{name:`unzip`,description:`Lista, testa e extrai arquivos compactados em um arquivo ZIP`,help:`unzip ARQUIVO.zip
+Exemplo:
+  sed "s/antigo/novo/g" arquivo.txt`,execute:async e=>{e.print(`Simulando transformação de fluxo...`)}},{name:`awk`,description:`Linguagem de busca e processamento de padrões`,help:`awk 'PADRÃO { AÇÃO }' [ARQUIVO]
 
-Extrai arquivos de um arquivo .zip.`,execute:async e=>{let t=e.args[0];if(!t){e.print(`UnZip 6.00 of 20 April 2009, by Info-ZIP.  Usage: unzip [-opts] zipfile`);return}e.print(`Archive:  ${t}\n  inflating: ${t.replace(`.zip`,``)}`)}},{name:`7z`,description:`Arquivador de arquivos com alta taxa de compressão`,help:`7z [COMANDO] ARQUIVO.7z
-
-Suite de compressão 7-Zip.
-
-Comandos:
-  a   adiciona ao arquivo
-  x   extrai com caminhos completos`,execute:async e=>{let t=e.args[0];t===`a`?e.print(`Creating archive: backup.7z
-Items to compress: 5
-Files read from disk: 5
-Everything is Ok`):t===`x`?e.print(`Extracting archive: backup.7z
-Everything is Ok`):e.print(`7-Zip 16.02 (x64) : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21
-Usage: 7z <command> [<switches>...] <archive_name>`)}},{name:`sed`,description:`Editor de fluxo para filtrar e transformar texto`,help:`sed EXPRESSÃO [ARQUIVO]
-
-Simula a edição de fluxo de texto usando expressões sed.`,execute:async e=>{e.print(`Simulando transformação de fluxo...`)}},{name:`awk`,description:`Linguagem de busca e processamento de padrões`,help:`awk 'PADRÃO { AÇÃO }' [ARQUIVO]
-
-Simula o processamento de padrões e colunas com awk.`,execute:async e=>{e.print(`Simulando processamento de colunas...`)}},{name:`sort`,description:`Ordena linhas de arquivos de texto`,help:`sort [OPÇÃO]... [ARQUIVO]
-
-Ordena as linhas do ARQUIVO (ou da entrada padrão).
+Exemplo:
+  awk '{print $1}' tabela.txt`,execute:async e=>{e.print(`Simulando processamento de colunas...`)}},{name:`sort`,description:`Ordena linhas de arquivos de texto`,help:`sort [OPÇÃO]... [ARQUIVO]
 
 Opções:
-  -n   ordenação numérica
-  -r   inverte o resultado da comparação`,execute:async e=>{let t=e.args.includes(`-r`),n=e.args.includes(`-n`),r=e.args.find(e=>!e.startsWith(`-`)),i=r?e.vfs.readFile(r,e.user):e.stdin;if(i&&i!==`Permissão negada`){let r=i.split(`
-`).filter(e=>e.length>0);n?r.sort((e,t)=>parseFloat(e)-parseFloat(t)):r.sort(),t&&r.reverse(),e.print(r.join(`
-`))}else e.print(`Uso: sort [-rn] [arquivo]`)}},{name:`uniq`,description:`Reporta ou omite linhas repetidas`,help:`uniq [OPÇÃO]... [ARQUIVO]
-
-Filtra linhas adjacentes duplicadas do ARQUIVO.
+  -n   numérica
+  -r   inverso`,execute:async e=>{e.print(`Linha 1
+Linha 2
+Linha 3`)}},{name:`uname`,description:`Imprime informações do sistema`,help:`uname [OPÇÃO]...
 
 Opções:
-  -c   prefixa as linhas com o número de ocorrências`,execute:async e=>{let t=e.args.includes(`-c`),n=e.args.find(e=>!e.startsWith(`-`)),r=n?e.vfs.readFile(n,e.user):e.stdin;if(r&&r!==`Permissão negada`){let n=r.split(`
-`).filter(e=>e.length>0);if(n.length===0)return;let i=[],a=n[0],o=0;n.forEach(e=>{e===a?o++:(i.push(t?`${o.toString().padStart(7)} ${a}`:a),a=e,o=1)}),i.push(t?`${o.toString().padStart(7)} ${a}`:a),e.print(i.join(`
-`))}}},{name:`cut`,description:`Remove seções de cada linha de arquivos`,help:`cut [OPÇÃO]... [ARQUIVO]
+  -a, --all    todas as informações
+  -r           versão do kernel`,execute:async e=>{e.print(`Linux LaBiOmicS 5.15.0-generic #1 SMP x86_64 GNU/Linux`)}},{name:`hostname`,description:`Exibe o nome do host do sistema`,help:`hostname
 
-Simula a extração de campos ou colunas de cada linha.
+Exibe o nome do nó na rede.`,execute:async e=>{e.print(`LaBiOmicS`)}},{name:`kill`,description:`Envia um sinal para um processo`,help:`kill PID
 
-Opções:
-  -d   especifica o delimitador
-  -f   seleciona apenas estes campos`,execute:async e=>{e.print(`Simulando extração de campos...`)}},{name:`uname`,description:`Imprime informações do sistema`,help:`uname [OPÇÃO]...
+Envia o sinal TERM para o processo especificado.`,execute:async e=>{e.args[0]&&e.print(`Processo ${e.args[0]} encerrado.`)}},{name:`export`,description:`Define variáveis de ambiente`,help:`export NOME=VALOR
 
-Exibe informações sobre o sistema.
+Exporta variáveis para processos filhos.`,execute:async e=>{e.print(`Variável exportada.`)}},{name:`env`,description:`Exibe as variáveis de ambiente`,help:`env
 
-Opções:
-  -a, --all    exibe todas as informações
-  -n           exibe o nome do nó na rede
-  -r           exibe a liberação do kernel
-  -m           exibe a arquitetura da máquina`,execute:async e=>{e.args.includes(`-a`)||e.args.includes(`--all`)?e.print(`Linux LaBiOmicS 5.15.0-generic #1 SMP x86_64 GNU/Linux`):e.args.includes(`-r`)?e.print(`5.15.0-generic`):e.args.includes(`-n`)?e.print(`LaBiOmicS`):e.args.includes(`-m`)?e.print(`x86_64`):e.print(`Linux`)}},{name:`hostname`,description:`Exibe ou define o nome do host do sistema`,help:`hostname
-
-Exibe o nome do host do sistema LaBiOmicS.`,execute:async e=>{e.print(`LaBiOmicS`)}},{name:`kill`,description:`Envia um sinal para um processo`,help:`kill [-s SINAL] PID
-
-Envia um sinal (por padrão TERM) para o processo com o PID especificado.`,execute:async e=>{if(!e.args[0]){e.printError(`kill: uso: kill [-s sinal | -n signum] pid`);return}e.print(`Processo ${e.args[0]} encerrado.`)}},{name:`pkill`,description:`Envia sinais para processos baseados no nome`,help:`pkill PADRÃO
-
-Envia sinais para processos cujos nomes correspondam ao PADRÃO.`,execute:async e=>{e.print(`Processos correspondentes a '${e.args[0]}' encerrados.`)}},{name:`which`,description:`Localiza um comando`,help:`which COMANDO...
-
-Localiza o executável do COMANDO no PATH do sistema.`,execute:async e=>{e.print(`/bin/${e.args[0]||`bash`}`)}},{name:`whereis`,description:`Localiza os arquivos binários, fontes e manuais de um comando`,help:`whereis COMANDO
-
-Localiza os arquivos binários, fontes e páginas de manual para os comandos especificados.`,execute:async e=>{e.print(`${e.args[0]}: /bin/${e.args[0]} /usr/share/man/man1/${e.args[0]}.1.gz`)}},{name:`alias`,description:`Define ou exibe apelidos de comandos`,help:`alias [NOME=COMANDO]
-
-Define ou exibe os apelidos registrados no shell.`,execute:async e=>{e.print(`alias ls='ls --color=auto'
-alias ll='ls -la'`)}},{name:`export`,description:`Define variáveis de ambiente`,help:`export NOME=VALOR
-
-Define o valor de uma variável de ambiente para que seja exportada para processos filhos.`,execute:async e=>{e.print(`export ${e.args[0]||`PATH=/usr/local/bin:/usr/bin:/bin`}`)}},{name:`env`,description:`Executa um programa em um ambiente modificado`,help:`env
-
-Lista as variáveis de ambiente atuais da sessão.`,execute:async e=>{e.print(`USER=dayhoff
+Lista todas as variáveis de ambiente da sessão.`,execute:async e=>{e.print(`USER=dayhoff
 SHELL=/bin/bash
-HOME=/home/dayhoff
-PATH=/usr/bin:/bin`)}},{name:`sleep`,description:`Atrasa por uma quantidade de tempo especificada`,help:`sleep NÚMERO
+HOME=/home/dayhoff`)}},{name:`sleep`,description:`Atrasa por uma quantidade de tempo`,help:`sleep NÚMERO
 
-Pausa a execução por NÚMERO segundos.`,execute:async e=>{let t=parseInt(e.args[0]||`1`);e.print(`Aguardando ${t} segundos...`),await new Promise(e=>setTimeout(e,Math.min(t*1e3,5e3)))}},{name:`diff`,description:`Compara arquivos linha por linha`,help:`diff ARQUIVO1 ARQUIVO2
+Pausa a execução por N segundos.`,execute:async e=>{let t=parseInt(e.args[0]||`1`);await new Promise(e=>setTimeout(e,Math.min(t*1e3,3e3)))}},{name:`which`,description:`Localiza um comando`,help:`which COMANDO
 
-Compara ARQUIVO1 com ARQUIVO2 e exibe as diferenças.`,execute:async e=>{e.print(`--- arquivo1
-+++ arquivo2
-- antiga
-+ nova`)}},{name:`file`,description:`Determina o tipo do arquivo`,help:`file ARQUIVO
-
-Analisa o conteúdo do ARQUIVO para determinar seu tipo.`,execute:async e=>{let t=e.args[0],n=t?e.vfs.getNode(t):null;n?e.print(`${t}: ${n.type===`directory`?`directory`:`ASCII text`}`):e.printError(`file: Arquivo não encontrado`)}},{name:`locate`,description:`Busca arquivos pelo nome em um banco de dados`,help:`locate NOME
-
-Busca caminhos que contenham o NOME especificado.`,execute:async e=>{e.print(`/usr/bin/${e.args[0]||`find`}\n/usr/share/man/man1/${e.args[0]||`find`}.1.gz`)}},{name:`xargs`,description:`Constrói e executa linhas de comando a partir da entrada padrão`,help:`xargs [COMANDO]
-
-Simula a construção de comandos a partir da entrada padrão.`,execute:async e=>{e.print(`Simulando execução de comandos em lote...`)}},{name:`mount`,description:`Monta um sistema de arquivos`,help:`mount
-
-Lista os sistemas de arquivos atualmente montados no sistema.`,execute:async e=>{e.print(`/dev/sda1 on / type ext4 (rw,relatime)
-tmpfs on /run type tmpfs (rw,nosuid,nodev,mode=755)`)}},{name:`umount`,description:`Desmonta sistemas de arquivos`,help:`umount CAMINHO
-
-Desmonta o sistema de arquivos especificado.`,execute:async e=>{e.print(`Desmontando ${e.args[0]}... OK`)}},{name:`systemctl`,description:`Controla o sistema systemd e o gerenciador de serviços`,help:`systemctl [COMANDO] [SERVIÇO]
-
-Simula o gerenciamento de serviços do sistema.
-
-Comandos comuns:
-  status, start, stop, restart`,execute:async e=>{e.print(`UNIT                            LOAD   ACTIVE SUB     DESCRIPTION
-nginx.service                   loaded active running The NGINX HTTP and reverse proxy server`)}},{name:`service`,description:`Executa um script de iniciação do System V`,help:`service SERVIÇO [COMANDO]
-
-Interface legada para gerenciamento de serviços.`,execute:async e=>{e.print(` [ + ]  apache2
- [ - ]  mysql`)}},{name:`dmesg`,description:`Imprime ou controla o buffer de anéis do kernel`,help:`dmesg
-
-Exibe as mensagens do buffer do kernel.`,execute:async e=>{e.print(`[    0.000000] Linux version 5.15.0-generic
-[    0.000000] Command line: BOOT_IMAGE=/vmlinuz root=UUID=...`)}},{name:`journalctl`,description:`Consulta o log do systemd`,help:`journalctl
-
-Exibe as mensagens coletadas pelo systemd-journald.`,execute:async e=>{e.print(`-- Logs begin at Thu 2026-04-23 10:00:00 -03. --
-Apr 23 12:00:01 LaBiOmics systemd[1]: Started Session 1.`)}},{name:`crontab`,description:`Mantém arquivos crontab para usuários individuais`,help:`crontab -l
-
-Lista as tarefas agendadas para o usuário atual.`,execute:async e=>{e.print(`# m h  dom mon dow   command
-0 5 * * * /usr/bin/backup.sh`)}},{name:`ip`,description:`Exibe ou manipula roteamento, dispositivos de rede, interfaces e túneis`,help:`ip [OPÇÃO] OBJETO [COMANDO]
-
-Suite moderna para gerenciamento de rede.
-
-Objetos comuns:
-  addr    endereços IP nas interfaces
-  link    estado das interfaces físicas`,execute:async e=>{e.print(`1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN
-    inet 127.0.0.1/8 scope host lo
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP`)}},{name:`ifconfig`,description:`Configura uma interface de rede (legado)`,help:`ifconfig
-
-Exibe as interfaces de rede ativas no sistema.`,execute:async e=>{e.print(`eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-        inet 192.168.1.10  netmask 255.255.255.0  broadcast 192.168.1.255`)}},{name:`netstat`,description:`Exibe conexões de rede, tabelas de roteamento e estatísticas de interface`,help:`netstat [OPÇÃO]
-
-Suite de estatísticas de rede.
-
-Opções:
-  -l   lista sockets em escuta
-  -n   exibe endereços numéricos`,execute:async e=>{e.print(`Active Internet connections (only servers)
-Proto Recv-Q Send-Q Local Address           Foreign Address         State
-tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN`)}},{name:`dig`,description:`Utilitário de busca DNS`,help:`dig HOST
-
-Realiza buscas detalhadas no DNS para o HOST especificado.`,execute:async e=>{e.print(`; <<>> DiG 9.18.12 <<>> google.com
-;; ANSWER SECTION:
-google.com.             300     IN      A       142.250.191.46`)}},{name:`nslookup`,description:`Consulta servidores de nomes de domínio interativamente`,help:`nslookup HOST
-
-Resolve o endereço IP para o HOST especificado.`,execute:async e=>{e.print(`Server:         127.0.0.53
-Address:        127.0.0.53#53
-
-Non-authoritative answer:
-Name:   google.com
-Address: 142.250.191.46`)}},{name:`nmap`,description:`Ferramenta de exploração de rede e scanner de segurança/portas`,help:`nmap HOST
-
-Varre portas abertas e serviços no HOST especificado.`,execute:async e=>{e.print(`Starting Nmap 7.93
-Nmap scan report for localhost (127.0.0.1)
-PORT     STATE SERVICE
-80/tcp   open  http
-443/tcp  open  https`)}},{name:`su`,description:`Muda o ID do usuário ou torna-se superusuário`,help:`su [USUÁRIO]
-
-Muda para a conta do USUÁRIO (por padrão, root).`,execute:async e=>{e.print(`Senha: 
-Logado como root.`)}},{name:`passwd`,description:`Altera a senha do usuário`,help:`passwd
-
-Permite ao usuário alterar sua própria senha no sistema.`,execute:async e=>{e.print(`Alterando senha para dayhoff.
-(atual) senha do UNIX: `)}},{name:`scp`,description:`Cópia segura (cópia de arquivo remoto)`,help:`scp ARQUIVO USUÁRIO@HOST:CAMINHO
-
-Copia arquivos com segurança através da rede usando o protocolo SSH.`,execute:async e=>{let t=e.args[0],n=e.args[1];if(!t||!n){e.print(`usage: scp [-346BCpqrTv] [[user@]host1:]file1 ... [[user@]host2:]file2`);return}e.print(`${t}                                   0%    0     0.0KB/s   --:-- ETA`),await new Promise(e=>setTimeout(e,500)),e.print(`${t}                                 100% 1024     1.0KB/s   00:00`)}},{name:`rsync`,description:`Ferramenta de cópia de arquivos rápida, versátil e remota (e local)`,help:`rsync [OPÇÃO]... ORIGEM DESTINO
-
-Sincronização eficiente de arquivos.
-
-Opções:
-  -a   modo de arquivamento (preserva permissões, etc)
-  -v   modo detalhado`,execute:async e=>{let t=e.args.includes(`-a`),n=e.args.includes(`-v`);if(e.args.length<2){e.print(`rsync  version 3.2.3  protocol version 31
-Usage: rsync [OPTION]... SRC [SRC]... DEST`);return}n&&e.print(`sending incremental file list`),e.print(`file1.txt
-file2.txt`),t&&e.print(`sent 1,234 bytes  received 67 bytes  2,602.00 bytes/sec
-total size is 1,120  speedup is 0.86`)}},{name:`lscpu`,description:`Exibe informações sobre a arquitetura da CPU`,help:`lscpu
-
-Exibe detalhes sobre a arquitetura da CPU, número de núcleos, cache, etc.`,execute:async e=>{e.print(`Architecture:            x86_64
-CPU op-mode(s):        32-bit, 64-bit
-Model name:              Intel(R) Core(TM) i7-10700K CPU @ 3.80GHz`)}},{name:`lsusb`,description:`Lista dispositivos USB`,help:`lsusb
-
-Exibe a lista de dispositivos conectados aos barramentos USB.`,execute:async e=>{e.print(`Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-Bus 001 Device 002: ID 046d:c52b Logitech, Inc. Unifying Receiver`)}},{name:`lspci`,description:`Lista todos os dispositivos PCI`,help:`lspci
-
-Exibe a lista de todos os dispositivos conectados ao barramento PCI.`,execute:async e=>{e.print(`00:00.0 Host bridge: Intel Corporation 10th Gen Core Processor Host Bridge
-01:00.0 VGA compatible controller: NVIDIA Corporation GA104 [GeForce RTX 3070]`)}},{name:`bash`,description:`Interpretador de linguagem de comandos compatível com sh`,help:`bash
-
-Inicia uma nova instância do interpretador de comandos Bash.`,execute:async e=>{e.print(`Iniciando uma nova instância do bash...`)}},{name:`sh`,description:`Interpretador de comandos (shell) padrão`,help:`sh
-
-Inicia o interpretador de comandos padrão.`,execute:async e=>{e.print(`Iniciando sh...`)}},{name:`zsh`,description:`O shell Z (Zsh)`,help:`zsh
-
-Inicia o interpretador de comandos Zsh.`,execute:async e=>{e.print(`Iniciando zsh...`)}},{name:`exit`,description:`Encerra o shell`,help:`exit
-
-Encerra a sessão atual do shell.`,execute:async e=>{e.print(`logout
-Sessão encerrada.`)}},{name:`logout`,description:`Faz log out de um shell de login`,help:`logout
-
-Encerra o shell de login atual.`,execute:async e=>{e.print(`logout`)}},{name:`shutdown`,description:`Desliga ou reinicia o sistema`,help:`shutdown [OPÇÃO]
-
-Agenda o desligamento do sistema.
-
-Opções:
-  -r   reinicia o sistema`,execute:async e=>{e.print(`Shutdown scheduled for Thu 2026-04-23 13:00:00 -03, use 'shutdown -c' to cancel.`)}},{name:`reboot`,description:`Reinicia o sistema`,help:`reboot
-
-Reinicia o sistema imediatamente.`,execute:async e=>{e.print(`Reiniciando o sistema agora...`)}},{name:`type`,description:`Indica como um nome seria interpretado se usado como um comando`,help:`type COMANDO
-
-Informa se o COMANDO é um binário, comando interno ou apelido.`,execute:async e=>{e.print(`${e.args[0]||`ls`} is hashed (/usr/bin/${e.args[0]||`ls`})`)}},{name:`tee`,description:`Lê da entrada padrão e escreve na saída padrão e em arquivos`,help:`COMANDO | tee ARQUIVO
-
-Lê a entrada e a exibe simultaneamente no terminal e no ARQUIVO.`,execute:async e=>{e.print(`Simulando bifurcação de saída...`)}},{name:`less`,description:`Filtro para visualização de arquivos (um por vez)`,help:`less ARQUIVO
-
-Exibe o conteúdo do arquivo permitindo a navegação para frente e para trás.`,execute:async e=>{e.print(`Simulando visualizador less...`)}},{name:`more`,description:`Filtro para visualização de arquivos (um por vez)`,help:`more ARQUIVO
-
-Exibe o conteúdo do arquivo uma tela por vez.`,execute:async e=>{e.print(`Simulando visualizador more...`)}},{name:`chgrp`,description:`Altera a propriedade de grupo de arquivos`,help:`chgrp GRUPO ARQUIVO
-
-Altera o grupo dono do ARQUIVO para o GRUPO especificado.`,execute:async e=>{e.print(`Grupo alterado.`)}},{name:`umask`,description:`Exibe ou define a máscara de criação de modo de arquivo`,help:`umask [VALOR]
-
-Exibe ou define as permissões padrão para a criação de novos arquivos.`,execute:async e=>{e.print(`0022`)}},{name:`head`,description:`Saída da primeira parte de arquivos`,help:`head [OPÇÃO]... [ARQUIVO]...
-
-Exibe as primeiras 10 linhas do ARQUIVO.
-
-Opções:
-  -n K   exibe as primeiras K linhas`,execute:async e=>{let t=10,n=e.args.indexOf(`-n`);if(n!==-1&&e.args[n+1])t=parseInt(e.args[n+1]);else{let n=e.args.find(e=>e.startsWith(`-`)&&/^\d+$/.test(e.slice(1)));n&&(t=parseInt(n.slice(1)))}let r=e.args.find(e=>!e.startsWith(`-`)&&e!==String(t)&&e!==`-n`),i=r?e.vfs.readFile(r,e.user):e.stdin;i!=null&&i!==`Permissão negada`?e.print(i.split(`
-`).slice(0,t).join(`
-`)):i===`Permissão negada`&&e.printError(`head: ${r}: Permissão negada`)}},{name:`tail`,description:`Saída da última parte de arquivos`,help:`tail [OPÇÃO]... [ARQUIVO]...
-
-Exibe as últimas 10 linhas do ARQUIVO.
-
-Opções:
-  -n K   exibe as últimas K linhas`,execute:async e=>{let t=10,n=e.args.indexOf(`-n`);if(n!==-1&&e.args[n+1])t=parseInt(e.args[n+1]);else{let n=e.args.find(e=>e.startsWith(`-`)&&/^\d+$/.test(e.slice(1)));n&&(t=parseInt(n.slice(1)))}let r=e.args.find(e=>!e.startsWith(`-`)&&e!==String(t)&&e!==`-n`),i=r?e.vfs.readFile(r,e.user):e.stdin;if(i!=null&&i!==`Permissão negada`){let n=i.split(`
-`).filter(e=>e.length>0);e.print(n.slice(Math.max(0,n.length-t)).join(`
-`))}else i===`Permissão negada`&&e.printError(`tail: ${r}: Permissão negada`)}}],dc=()=>JSON.parse(localStorage.getItem(`terminal_envs`)||`["base"]`),fc=e=>{let t=dc();t.includes(e)||(t.push(e),localStorage.setItem(`terminal_envs`,JSON.stringify(t)))},pc=e=>JSON.parse(localStorage.getItem(`pkgs_${e}`)||`["python", "pip", "bash"]`),mc=(e,t)=>{let n=pc(e);n.includes(t)||(n.push(t),localStorage.setItem(`pkgs_${e}`,JSON.stringify(n)))},hc=[{name:`conda`,description:`Gerenciador de pacotes e ambientes (Conda)`,help:`conda [COMANDO] [OPÇÕES]
+Mostra o caminho completo do executável.`,execute:async e=>{e.print(`/usr/bin/${e.args[0]||`bash`}`)}}],dc=()=>JSON.parse(localStorage.getItem(`terminal_envs`)||`["base"]`),fc=e=>{let t=dc();t.includes(e)||(t.push(e),localStorage.setItem(`terminal_envs`,JSON.stringify(t)))},pc=e=>JSON.parse(localStorage.getItem(`pkgs_${e}`)||`["python", "pip", "bash"]`),mc=(e,t)=>{let n=pc(e);n.includes(t)||(n.push(t),localStorage.setItem(`pkgs_${e}`,JSON.stringify(n)))},hc=[{name:`conda`,description:`Gerenciador de pacotes e ambientes (Conda)`,help:`conda [COMANDO] [OPÇÕES]
 
 Gerencia ambientes virtuais e pacotes.
 
@@ -765,8 +521,10 @@ Comandos:
 
 Sai do ambiente virtual ativo e retorna ao ambiente base.`,execute:async e=>{e.setEnv(``),e.print(`Ambiente desativado.`)}}],gc=class{commands=new Map;constructor(){[...sc,...cc,...lc,...uc,...hc].forEach(e=>{this.commands.set(e.name,e)});let e={name:`ajuda`,description:`Exibe informações sobre os comandos disponíveis`,help:`ajuda
 
-Lista todos os comandos registrados e exibe dicas de uso para iniciantes.`,execute:async e=>{e.print(`\x1B[1;32mComandos disponíveis:\x1B[0m`);let t=new Map;this.commands.forEach(e=>{t.has(e.name)||t.set(e.name,e)});let n=Array.from(t.values()).sort((e,t)=>e.name.localeCompare(t.name));for(let t of n){let n=t.name.padEnd(12);e.print(`  \x1b[1;36m${n}\x1b[0m - ${t.description}`)}e.print(`
-\x1B[1;33mDicas de Uso:\x1B[0m`),e.print(`  \x1B[1;36mls -la\x1B[0m      - Lista tudo (incluindo ocultos) com detalhes`),e.print(`  \x1B[1;36mgrep -i "A"\x1B[0m  - Busca ignorando maiúsculas/minúsculas`),e.print(`  \x1B[1;36mdf -h\x1B[0m       - Mostra espaço em disco em formato legível`),e.print(`  \x1B[1;36mhead -n 5\x1B[0m   - Mostra as primeiras 5 linhas`),e.print(`  \x1B[1;36mhistory\x1B[0m     - Veja seus últimos comandos`),e.print(`  \x1B[1;36mmissao\x1B[0m      - Mostra o que você deve fazer agora`)}};this.commands.set(`ajuda`,e),this.commands.set(`help`,e),this.commands.set(`tema`,{name:`tema`,description:`Muda o estilo visual do terminal`,execute:async()=>{}}),this.commands.set(`missao`,{name:`missao`,description:`Mostra o objetivo atual`,execute:async()=>{}}),this.commands.set(`quest`,{name:`missao`,description:`Mostra o objetivo atual`,execute:async()=>{}})}getCommand(e){return this.commands.get(e)}getAllCommands(){return Array.from(this.commands.values())}},_c=[{name:`Novato(a)`,minXp:0},{name:`Iniciante`,minXp:500},{name:`Intermediário(a)`,minXp:1200},{name:`Avançado(a)`,minXp:2500},{name:`Especialista`,minXp:5e3}],vc=[{id:`so-1`,category:`Sistemas Operacionais`,title:`Explorador de Arquivos`,description:`Comece pelo básico. Liste os arquivos do seu diretório atual para ver o que há por aqui.`,hint:`Use o comando 'ls'.`,xp:100,checkCondition:(e,t)=>t===`ls`,completionMessage:`Você deu o primeiro passo na navegação de sistemas!`},{id:`so-2`,category:`Sistemas Operacionais`,title:`Hierarquia Oculta`,description:`Muitos arquivos importantes no Linux começam com ponto (.). Liste todos os arquivos, incluindo os ocultos.`,hint:`Tente 'ls -la'.`,xp:150,checkCondition:(e,t,n)=>n.includes(`ls`)&&n.includes(`-a`),completionMessage:`Parabéns! Você descobriu arquivos de configuração como o .bashrc.`},{id:`so-3`,category:`Sistemas Operacionais`,title:`Acesso Administrativo`,description:`Tente visualizar o conteúdo do diretório '/root'. Você precisará elevar seus privilégios.`,hint:`Use 'sudo ls /root'.`,xp:250,checkCondition:(e,t,n)=>t===`sudo`&&n.includes(`ls /root`),completionMessage:`Poder de root concedido! Cuidado ao usar este comando.`},{id:`data-1`,category:`Manipulação de Dados`,title:`Coleta de Dados`,description:`Baixe um conjunto de dados simulado da web para análise.`,hint:`Use 'wget http://exemplo.com/dados.csv'.`,xp:200,checkCondition:(e,t)=>t===`wget`||t===`curl`,completionMessage:`Download concluído! Agora os dados estão prontos para o processamento.`},{id:`data-2`,category:`Manipulação de Dados`,title:`Descompactação Progressiva`,description:`Muitos datasets vêm compactados. Crie um arquivo .tar simulado e depois extraia-o.`,hint:`Use 'tar -cvf backup.tar projetos' e depois 'tar -xvf backup.tar'.`,xp:300,checkCondition:(e,t)=>t===`tar`,completionMessage:`Domínio de empacotamento e compressão alcançado!`},{id:`data-3`,category:`Manipulação de Dados`,title:`Minerador de Texto`,description:`Filtre linhas específicas de um arquivo de log e conte as ocorrências.`,hint:`Tente algo como 'grep "Erro" log.txt | wc -l'.`,xp:400,checkCondition:(e,t,n)=>n.includes(`|`)&&n.includes(`grep`)&&n.includes(`wc`),completionMessage:`Mestre dos Pipes! O encadeamento de comandos é o segredo da produtividade.`},{id:`science-1`,category:`Computação Científica`,title:`O Laboratório Virtual`,description:`Na ciência, a reprodutibilidade é tudo. Crie um ambiente isolado chamado 'projeto_beta' usando mamba.`,hint:`Tente 'mamba create -n projeto_beta'.`,xp:400,checkCondition:()=>JSON.parse(localStorage.getItem(`terminal_envs`)||`[]`).includes(`projeto_beta`),completionMessage:`Ambiente criado! Você agora pode gerenciar dependências sem conflitos.`},{id:`science-2`,category:`Computação Científica`,title:`Ativação de Ferramentas`,description:`Ative seu novo ambiente para começar a instalar ferramentas específicas.`,hint:`Use 'conda activate projeto_beta'.`,xp:300,checkCondition:()=>localStorage.getItem(`current_env`)===`projeto_beta`,completionMessage:`Prompt alterado! Você está operando de forma isolada e segura.`},{id:`science-3`,category:`Computação Científica`,title:`Análise Genômica Real`,description:`Instale a ferramenta 'samtools' no ambiente e visualize os dados do arquivo fasta.`,hint:`Use 'mamba install samtools' e depois explore o comando 'fasta-view'.`,xp:500,checkCondition:(e,t)=>{let n=JSON.parse(localStorage.getItem(`pkgs_projeto_beta`)||`[]`);return t===`mamba`&&n.includes(`samtools`)||t===`fasta-view`},completionMessage:`Jornada concluída! Você domina do SO básico à Computação Científica avançada.`}],yc=[{id:`admin_badge`,name:`Administrador(a)`,description:`Usou comandos sudo com sucesso`,icon:`⚡`,condition:e=>e.sudoCount>0},{id:`pipe_badge`,name:`Mestre dos Pipes`,description:`Executou filtros complexos com pipes`,icon:`🔗`,condition:e=>e.pipeCount>=3},{id:`env_badge`,name:`Cientista de Ambientes`,description:`Gerenciou múltiplos ambientes virtuais`,icon:`🧪`,condition:e=>e.envCount>=2}],bc=class{currentQuestIndex=0;totalXp=0;stats={sudoCount:0,pipeCount:0,envCount:1};constructor(){this.loadState()}loadState(){let e=localStorage.getItem(`quest_manager_state`);if(e){let t=JSON.parse(e);this.currentQuestIndex=t.index||0,this.totalXp=t.xp||0,this.stats=t.stats||this.stats}let t=JSON.parse(localStorage.getItem(`terminal_envs`)||`["base"]`);this.stats.envCount=t.length}saveState(){localStorage.setItem(`quest_manager_state`,JSON.stringify({index:this.currentQuestIndex,xp:this.totalXp,stats:this.stats}))}getRank(){return[..._c].reverse().find(e=>this.totalXp>=e.minXp)||_c[0]}getXP(){return this.totalXp}getProgress(){return`${this.currentQuestIndex}/${vc.length}`}getCurrentQuest(){return this.currentQuestIndex<vc.length?vc[this.currentQuestIndex]:null}getAchievements(){return yc.filter(e=>e.condition(this.stats))}checkProgress(e,t,n){let r=this.getCurrentQuest();n.startsWith(`sudo`)&&this.stats.sudoCount++,n.includes(`|`)&&this.stats.pipeCount++;let i=JSON.parse(localStorage.getItem(`terminal_envs`)||`["base"]`);if(this.stats.envCount=i.length,r&&r.checkCondition(e,t,n)){let e=this.getRank().name;this.totalXp+=r.xp,this.currentQuestIndex++;let t=this.getRank().name;return this.saveState(),{quest:r,rankUp:e!==t}}return this.saveState(),null}},xc=class{vfs;registry;questManager;terminal;currentLine=``;history=[];historyIndex=-1;onStateChange;promptStyle=`bash`;currentUser=`dayhoff`;currentEnv=``;constructor(e,t){this.terminal=e,this.onStateChange=t;let n=localStorage.getItem(`vfs_state`);this.vfs=new oc(n?JSON.parse(n):void 0),this.registry=new gc,this.questManager=new bc;let r=localStorage.getItem(`prompt_style`);r&&(this.promptStyle=r);let i=localStorage.getItem(`current_user`);i&&(this.currentUser=i);let a=localStorage.getItem(`current_env`);a&&(this.currentEnv=a),this.terminal.onData(e=>this.handleData(e));let o=(e,t=`0`)=>`# \x1b[${t}m${e}\x1b[0m${` `.repeat(Math.max(0,61-e.length))} #`,s=[`#`.repeat(65),`# `+` `.repeat(61)+` #`,o(`AMBIENTE DE ENSINO MULTIDISCIPLINAR - LABIOMICS`,`1;33`),`# `+` `.repeat(61)+` #`,o(`Módulo 1: Fundamentos de Sistemas Operacionais`,`1;32`),o(`Módulo 2: Ferramentas de Manipulação de Dados`,`1;32`),o(`Módulo 3: Computação Científica e Ambientes`,`1;32`),`# `+` `.repeat(61)+` #`,o(`Digite 'missao' para iniciar sua jornada.`,`1;36`),o(`Digite 'ajuda' para listar os comandos.`,`1;36`),`# `+` `.repeat(61)+` #`,`#`.repeat(65)];this.terminal.write(`\x1B[1;34m`),s.forEach(e=>this.terminal.write(e+`\r
+Lista todos os comandos registrados e exibe dicas de uso para iniciantes.`,execute:async e=>{let t=new Map;this.commands.forEach(e=>{t.has(e.name)||t.set(e.name,e)});let n=Array.from(t.values()).sort((e,t)=>e.name.localeCompare(t.name));e.print(`\x1B[1;32m=== AMBIENTE LABIOMICS - AJUDA ===\x1B[0m`),e.print(`Total de comandos disponíveis: \x1b[1;36m${n.length}\x1b[0m`),e.print(`
+Digite \x1B[1;33mcomando --help\x1B[0m para detalhes de uso.
+`);for(let t of n){let n=t.name.padEnd(15);e.print(`  \x1b[1;36m${n}\x1b[0m - ${t.description}`)}e.print(`
+\x1B[1;33mDicas Rápidas:\x1B[0m`),e.print(`  \x1B[1;36mmissao\x1B[0m      - Ver o que fazer agora`),e.print(`  \x1B[1;36mtema\x1B[0m        - Mudar visual do prompt`),e.print(`  \x1B[1;36mclear\x1B[0m       - Limpar o terminal`)}};this.commands.set(`ajuda`,e),this.commands.set(`help`,e),this.commands.set(`tema`,{name:`tema`,description:`Muda o estilo visual do terminal`,execute:async()=>{}}),this.commands.set(`missao`,{name:`missao`,description:`Mostra o objetivo atual`,execute:async()=>{}}),this.commands.set(`quest`,{name:`missao`,description:`Mostra o objetivo atual`,execute:async()=>{}})}getCommand(e){return this.commands.get(e)}getAllCommands(){return Array.from(this.commands.values())}},_c=[{name:`Novato(a)`,minXp:0},{name:`Iniciante`,minXp:500},{name:`Intermediário(a)`,minXp:1200},{name:`Avançado(a)`,minXp:2500},{name:`Especialista`,minXp:5e3}],vc=[{id:`so-1`,category:`Sistemas Operacionais`,title:`Explorador de Arquivos`,description:`Comece pelo básico. Liste os arquivos do seu diretório atual para ver o que há por aqui.`,hint:`Use o comando 'ls'.`,xp:100,checkCondition:(e,t)=>t===`ls`,completionMessage:`Você deu o primeiro passo na navegação de sistemas!`},{id:`so-2`,category:`Sistemas Operacionais`,title:`Hierarquia Oculta`,description:`Muitos arquivos importantes no Linux começam com ponto (.). Liste todos os arquivos, incluindo os ocultos.`,hint:`Tente 'ls -la'.`,xp:150,checkCondition:(e,t,n)=>n.includes(`ls`)&&n.includes(`-a`),completionMessage:`Parabéns! Você descobriu arquivos de configuração como o .bashrc.`},{id:`so-3`,category:`Sistemas Operacionais`,title:`Acesso Administrativo`,description:`Tente visualizar o conteúdo do diretório '/root'. Você precisará elevar seus privilégios.`,hint:`Use 'sudo ls /root'.`,xp:250,checkCondition:(e,t,n)=>t===`sudo`&&n.includes(`ls /root`),completionMessage:`Poder de root concedido! Cuidado ao usar este comando.`},{id:`data-1`,category:`Manipulação de Dados`,title:`Coleta de Dados`,description:`Baixe um conjunto de dados simulado da web para análise.`,hint:`Use 'wget http://exemplo.com/dados.csv'.`,xp:200,checkCondition:(e,t)=>t===`wget`||t===`curl`,completionMessage:`Download concluído! Agora os dados estão prontos para o processamento.`},{id:`data-2`,category:`Manipulação de Dados`,title:`Descompactação Progressiva`,description:`Muitos datasets vêm compactados. Crie um arquivo .tar simulado e depois extraia-o.`,hint:`Use 'tar -cvf backup.tar projetos' e depois 'tar -xvf backup.tar'.`,xp:300,checkCondition:(e,t)=>t===`tar`,completionMessage:`Domínio de empacotamento e compressão alcançado!`},{id:`data-3`,category:`Manipulação de Dados`,title:`Minerador de Texto`,description:`Filtre linhas específicas de um arquivo de log e conte as ocorrências.`,hint:`Tente algo como 'grep "Erro" log.txt | wc -l'.`,xp:400,checkCondition:(e,t,n)=>n.includes(`|`)&&n.includes(`grep`)&&n.includes(`wc`),completionMessage:`Mestre dos Pipes! O encadeamento de comandos é o segredo da produtividade.`},{id:`science-1`,category:`Computação Científica`,title:`O Laboratório Virtual`,description:`Na ciência, a reprodutibilidade é tudo. Crie um ambiente isolado chamado 'projeto_beta' usando mamba.`,hint:`Tente 'mamba create -n projeto_beta'.`,xp:400,checkCondition:()=>JSON.parse(localStorage.getItem(`terminal_envs`)||`[]`).includes(`projeto_beta`),completionMessage:`Ambiente criado! Você agora pode gerenciar dependências sem conflitos.`},{id:`science-2`,category:`Computação Científica`,title:`Ativação de Ferramentas`,description:`Ative seu novo ambiente para começar a instalar ferramentas específicas.`,hint:`Use 'conda activate projeto_beta'.`,xp:300,checkCondition:()=>localStorage.getItem(`current_env`)===`projeto_beta`,completionMessage:`Prompt alterado! Você está operando de forma isolada e segura.`},{id:`science-3`,category:`Computação Científica`,title:`Análise Genômica Real`,description:`Instale a ferramenta 'samtools' no ambiente e visualize os dados do arquivo fasta.`,hint:`Use 'mamba install samtools' e depois explore o comando 'fasta-view'.`,xp:500,checkCondition:(e,t)=>{let n=JSON.parse(localStorage.getItem(`pkgs_projeto_beta`)||`[]`);return t===`mamba`&&n.includes(`samtools`)||t===`fasta-view`},completionMessage:`Jornada concluída! Você domina do SO básico à Computação Científica avançada.`}],yc=[{id:`admin_badge`,name:`Administrador(a)`,description:`Usou comandos sudo com sucesso`,icon:`⚡`,condition:e=>e.sudoCount>0},{id:`pipe_badge`,name:`Mestre dos Pipes`,description:`Executou filtros complexos com pipes`,icon:`🔗`,condition:e=>e.pipeCount>=3},{id:`env_badge`,name:`Cientista de Ambientes`,description:`Gerenciou múltiplos ambientes virtuais`,icon:`🧪`,condition:e=>e.envCount>=2}],bc=class{currentQuestIndex=0;totalXp=0;stats={sudoCount:0,pipeCount:0,envCount:1};constructor(){this.loadState()}loadState(){let e=localStorage.getItem(`quest_manager_state`);if(e){let t=JSON.parse(e);this.currentQuestIndex=t.index||0,this.totalXp=t.xp||0,this.stats=t.stats||this.stats}let t=JSON.parse(localStorage.getItem(`terminal_envs`)||`["base"]`);this.stats.envCount=t.length}saveState(){localStorage.setItem(`quest_manager_state`,JSON.stringify({index:this.currentQuestIndex,xp:this.totalXp,stats:this.stats}))}getRank(){return[..._c].reverse().find(e=>this.totalXp>=e.minXp)||_c[0]}getXP(){return this.totalXp}getProgress(){return`${this.currentQuestIndex}/${vc.length}`}getCurrentQuest(){return this.currentQuestIndex<vc.length?vc[this.currentQuestIndex]:null}getAchievements(){return yc.filter(e=>e.condition(this.stats))}checkProgress(e,t,n){let r=this.getCurrentQuest();n.startsWith(`sudo`)&&this.stats.sudoCount++,n.includes(`|`)&&this.stats.pipeCount++;let i=JSON.parse(localStorage.getItem(`terminal_envs`)||`["base"]`);if(this.stats.envCount=i.length,r&&r.checkCondition(e,t,n)){let e=this.getRank().name;this.totalXp+=r.xp,this.currentQuestIndex++;let t=this.getRank().name;return this.saveState(),{quest:r,rankUp:e!==t}}return this.saveState(),null}},xc=class{vfs;registry;questManager;terminal;currentLine=``;history=[];historyIndex=-1;onStateChange;promptStyle=`bash`;currentUser=`dayhoff`;currentEnv=``;constructor(e,t){this.terminal=e,this.onStateChange=t;let n=localStorage.getItem(`vfs_state`);this.vfs=new oc(n?JSON.parse(n):void 0),this.registry=new gc,this.questManager=new bc;let r=localStorage.getItem(`prompt_style`);r&&(this.promptStyle=r);let i=localStorage.getItem(`current_user`);i&&(this.currentUser=i);let a=localStorage.getItem(`current_env`);a&&(this.currentEnv=a),this.terminal.onData(e=>this.handleData(e));let o=(e,t=`0`)=>`# \x1b[${t}m${e}\x1b[0m${` `.repeat(Math.max(0,61-e.length))} #`,s=[`#`.repeat(65),`# `+` `.repeat(61)+` #`,o(`AMBIENTE DE ENSINO MULTIDISCIPLINAR - LABIOMICS`,`1;33`),`# `+` `.repeat(61)+` #`,o(`Módulo 1: Fundamentos de Sistemas Operacionais`,`1;32`),o(`Módulo 2: Ferramentas de Manipulação de Dados`,`1;32`),o(`Módulo 3: Computação Científica e Ambientes`,`1;32`),`# `+` `.repeat(61)+` #`,o(`Digite 'missao' para iniciar sua jornada.`,`1;36`),o(`Digite 'ajuda' para listar os comandos.`,`1;36`),`# `+` `.repeat(61)+` #`,`#`.repeat(65)];this.terminal.write(`\x1B[1;34m`),s.forEach(e=>this.terminal.write(e+`\r
 `)),this.terminal.write(`\x1B[0m`),this.printPrompt()}getVFS(){return this.vfs}getQuestManager(){return this.questManager}getPromptStyle(){return this.promptStyle}setPromptStyle(e){this.promptStyle=e,this.saveState()}printPrompt(){let e=this.vfs.getCwd().replace(`/home/dayhoff`,`~`),t=this.currentUser,n=this.currentEnv?`(${this.currentEnv}) `:``,r=t===`root`?`#`:`$`;switch(this.promptStyle){case`zsh`:this.terminal.write(`\r\n\x1b[1;36m➜  ${n}\x1b[1;32m${e}\x1b[0m \x1b[1;34mgit:(\x1b[1;31mmain\x1b[1;34m)\x1b[0m `);break;case`minimal`:this.terminal.write(`\r\n\x1b[1;32m${n}${e} ${r}\x1b[0m `);break;default:{let i=t===`root`?`\x1B[1;31m`:`\x1B[1;32m`;this.terminal.write(`\r\n${n}${i}${t}@LaBiOmicS\x1b[0m:\x1b[1;34m${e}\x1b[0m${r} `);break}}this.terminal.scrollToBottom()}async handleData(e){switch(e){case`\r`:await this.handleEnter();break;case``:this.handleBackspace();break;case`\x1B[A`:this.handleHistory(-1);break;case`\x1B[B`:this.handleHistory(1);break;default:e>=` `&&e<=`~`&&(this.currentLine+=e,this.terminal.write(e))}}saveState(){localStorage.setItem(`vfs_state`,JSON.stringify(this.vfs.getState())),localStorage.setItem(`prompt_style`,this.promptStyle),localStorage.setItem(`current_user`,this.currentUser),localStorage.setItem(`current_env`,this.currentEnv),this.onStateChange&&this.onStateChange()}async handleEnter(){let e=this.currentLine.trim();this.terminal.write(`\r
 `);let t=``;e&&(this.history.push(e),this.historyIndex=this.history.length,t=e.split(/\s+/)[0],await this.executeCommand(e));let n=this.questManager.checkProgress(this.vfs,t,e);if(n){let{quest:e,rankUp:t}=n;if(this.terminal.write(`\r\n\x1b[1;32m✅ MISSÃO CONCLUÍDA: ${e.title} (+${e.xp} XP)\x1b[0m\r\n`),this.terminal.write(`${e.completionMessage}\r\n`),t){let e=this.questManager.getRank();this.terminal.write(`\r\n\x1b[1;33m🎊 PARABÉNS! Você foi promovido(a) a: ${e.name}!\x1b[0m\r\n`)}let r=this.questManager.getCurrentQuest();r?(this.terminal.write(`\r\n\x1b[1;34m🚀 PRÓXIMA MISSÃO [${r.category}]: ${r.title}\x1b[0m\r\n`),this.terminal.write(`${r.description}\r\n`)):this.terminal.write(`\r
 \x1B[1;35m🏆 PARABÉNS! Você atingiu o ápice da carreira em Bioinformática!\x1B[0m\r
