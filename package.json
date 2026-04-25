@@ -1,6 +1,6 @@
 {
   "name": "@labiomics/aramas",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ambiente Remoto para o Aprendizado e Manipulação de Arquivos e Sistemas - A gamified educational platform for learning Linux and Bioinformatics.",
   "type": "module",
   "files": [
