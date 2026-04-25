@@ -1,0 +1,32 @@
+name: Publicar no NPM
+
+on:
+  push:
+    tags:
+      - 'v*' # Dispara apenas quando uma tag começando com 'v' é enviada
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Instalar dependências e Build
+        run: |
+          cd gamified-terminal
+          npm install
+          npm run build
+
+      - name: Publicar no NPM
+        run: |
+          cd gamified-terminal
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
