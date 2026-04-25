@@ -5,6 +5,7 @@
   <img src="icon.png" alt="ARAMAS Logo" width="70%">
 </p>
 
+[![DOI](https://zenodo.org/badge/1218430102.svg)](https://doi.org/10.5281/zenodo.19768374)
 [![University: UMC](https://img.shields.io/badge/University-UMC-0D47A1.svg)](https://www.umc.br/)
 [![Laboratory: LaBiOmicS](https://img.shields.io/badge/Laboratory-LaBiOmicS-7B1FA2.svg)](https://github.com/LaBiOmicS)
 
