@@ -13,7 +13,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-v22.22.2-green.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19768375.svg)](https://doi.org/10.5281/zenodo.19768375)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![GitHub issues](https://img.shields.io/github/issues/LaBiOmicS/aramas)](https://github.com/LaBiOmicS/aramas/issues)
 [![GitHub stars](https://img.shields.io/github/stars/LaBiOmicS/aramas)](https://github.com/LaBiOmicS/aramas/stargazers)
