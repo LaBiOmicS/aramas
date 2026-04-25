@@ -20,7 +20,7 @@ O **ARAMAS** é uma plataforma educacional imersiva e gamificada projetada para 
 ---
 
 <p align="center">
-  <img src="infografico.png" alt="metaLncRNA Infographic" width="100%">
+  <img src="infografico.png" alt="ARAMAS Infographic" width="100%">
 </p>
 
 ---
@@ -134,6 +134,12 @@ gamified-terminal/
     ```bash
     npm run build
     ```
+
+---
+
+<p align="center">
+  <img src="poster.png" alt="ARAMAS Infographic" width="100%">
+</p>
 
 ---
 
