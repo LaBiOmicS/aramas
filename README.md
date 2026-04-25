@@ -13,7 +13,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-v22.22.2-green.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14925829.svg)](https://doi.org/10.5281/zenodo.14925829)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19768375.svg)](https://doi.org/10.5281/zenodo.19768375)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![GitHub issues](https://img.shields.io/github/issues/LaBiOmicS/aramas)](https://github.com/LaBiOmicS/aramas/issues)
 [![GitHub stars](https://img.shields.io/github/stars/LaBiOmicS/aramas)](https://github.com/LaBiOmicS/aramas/stargazers)
@@ -205,7 +205,7 @@ O projeto **ARAMAS** é uma iniciativa acadêmica desenvolvida no âmbito da Bio
 
 Se você utilizar o **ARAMAS** em seu trabalho acadêmico ou pedagógico, por favor, cite-o utilizando o DOI do Zenodo:
 
-> Menegidio, F. B. (2026). ARAMAS: Ambiente Remoto para o Aprendizado e Manipulação de Arquivos e Sistemas (v1.0.2). Zenodo. https://doi.org/10.5281/zenodo.14925829
+> Menegidio, F. B. (2026). ARAMAS: Ambiente Remoto para o Aprendizado e Manipulação de Arquivos e Sistemas (v1.0.2). Zenodo. https://doi.org/10.5281/zenodo.19768375
 
 ---
 
