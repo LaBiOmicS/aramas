@@ -1,9 +1,22 @@
 {
-  "name": "aramas",
-  "private": true,
+  "name": "@labiomics/aramas",
   "version": "1.0.0",
   "description": "Ambiente Remoto para o Aprendizado e Manipulação de Arquivos e Sistemas - A gamified educational platform for learning Linux and Bioinformatics.",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/aramas.umd.cjs",
+  "module": "./dist/aramas.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/aramas.js",
+      "require": "./dist/aramas.umd.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./dist/style.css": "./dist/style.css"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LaBiOmicS/aramas.git"
@@ -15,7 +28,8 @@
     "education",
     "terminal",
     "xtermjs",
-    "react"
+    "react",
+    "simulation"
   ],
   "author": "Fabiano B. Menegidio",
   "license": "MIT",
@@ -35,11 +49,13 @@
   "dependencies": {
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",
     "xterm": "^5.3.0",
     "xterm-addon-fit": "^0.8.0"
+  },
+  "peerDependencies": {
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

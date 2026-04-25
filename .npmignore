@@ -1,0 +1,26 @@
+# Ignore all source files
+src/
+public/
+tests/
+.github/
+
+# Ignore configuration files
+vite.config.ts
+tsconfig.json
+tsconfig.app.json
+tsconfig.node.json
+eslint.config.js
+.editorconfig
+.gitignore
+.nvmrc
+
+# Ignore documentation files not needed on NPM
+paper.md
+paper.bib
+
+# Keep only dist and essential metadata
+!dist/
+!package.json
+!README.md
+!LICENSE
+!CITATION.cff
