@@ -22,12 +22,12 @@ const LandingPage: React.FC = () => {
               <span className="badge">Bioinformática</span>
               <span className="badge">Gamificado</span>
             </div>
-            <div className="cta-group" style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+            <div className="cta-group">
               <button className="cta-button" onClick={() => navigate('/terminal')}>
-                ACESSAR TERMINAL <span className="arrow">→</span>
+                <span className="icon">💻</span> ACESSAR TERMINAL <span className="arrow">→</span>
               </button>
               <button className="cta-button secondary" onClick={() => window.open(repoUrl, '_blank')}>
-                REPOSITÓRIO GITHUB
+                <span className="icon">📂</span> REPOSITÓRIO GITHUB
               </button>
             </div>
           </div>
