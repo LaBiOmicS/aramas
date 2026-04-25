@@ -1,4 +1,4 @@
-# ARAMAS v1.0.0
+# ARAMAS v1.0.2
 ### Ambiente Remoto para o Aprendizado e Manipulação de Arquivos e Sistemas
 
 <p align="center">
@@ -9,9 +9,11 @@
 [![University: UMC](https://img.shields.io/badge/University-UMC-0D47A1.svg)](https://www.umc.br/)
 [![Laboratory: LaBiOmicS](https://img.shields.io/badge/Laboratory-LaBiOmicS-7B1FA2.svg)](https://github.com/LaBiOmicS)
 
+[![NPM Version](https://img.shields.io/npm/v/@labiomics/aramas.svg)](https://www.npmjs.com/package/@labiomics/aramas)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-v22.22.2-green.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14925829.svg)](https://doi.org/10.5281/zenodo.14925829)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![GitHub issues](https://img.shields.io/github/issues/LaBiOmicS/aramas)](https://github.com/LaBiOmicS/aramas/issues)
 [![GitHub stars](https://img.shields.io/github/stars/LaBiOmicS/aramas)](https://github.com/LaBiOmicS/aramas/stargazers)
@@ -28,19 +30,27 @@ O **ARAMAS** é uma plataforma educacional imersiva e gamificada projetada para 
 
 ## 📋 Sumário
 - [🚀 Demonstração Online](#-demonstração-online)
+- [📦 Registro NPM](#-registro-npm)
 - [🧬 Principais Funcionalidades](#-principais-funcionalidades)
 - [📚 Estrutura Educacional](#-estrutura-educacional-módulos)
 - [🛠️ Tecnologias Utilizadas](#-tecnologias-utilizadas)
+- [📦 Integração via NPM](#-integração-via-npm)
 - [📂 Estrutura do Projeto](#-estrutura-do-projeto)
 - [⚙️ Desenvolvimento e Instalação](#-desenvolvimento-e-instalação-local)
 - [🤝 Contribuição](#-contribuição)
 - [👤 Coordenação e Créditos](#-coordenação-e-créditos)
+- [📝 Citação](#-citação)
 - [📄 Licença](#-licença)
 
 ---
 
 ## 🚀 Demonstração Online
 Acesse a plataforma agora: [https://labiomics.github.io/aramas/](https://labiomics.github.io/aramas/)
+
+---
+
+## 📦 Registro NPM
+O pacote oficial está disponível em: [https://www.npmjs.com/package/@labiomics/aramas](https://www.npmjs.com/package/@labiomics/aramas)
 
 ---
 
@@ -87,6 +97,37 @@ Modern bioinformatics relies heavily on command-line proficiency. However, the i
 - **Roteamento:** React Router Dom (HashRouter)
 - **Engine de Build:** Vite + Rolldown
 - **Estilização:** Vanilla CSS3 com variáveis dinâmicas
+
+---
+
+## 📦 Integração via NPM
+
+O **ARAMAS** pode ser integrado em outros projetos como um componente React ou através de seus motores lógicos.
+
+### Instalação
+```bash
+npm install @labiomics/aramas
+```
+
+### Uso como Componente (React)
+```tsx
+import { AramasTerminal } from '@labiomics/aramas';
+import '@labiomics/aramas/dist/style.css';
+
+function App() {
+  return (
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <AramasTerminal />
+    </div>
+  );
+}
+```
+
+### Uso de Motores (Headless)
+Você também pode acessar as classes de lógica diretamente:
+```typescript
+import { TerminalEngine, VFSManager, QuestManager } from '@labiomics/aramas';
+```
 
 ---
 
@@ -155,8 +196,16 @@ Contribuições são muito bem-vindas! Se você tem uma ideia de nova missão, n
 O projeto **ARAMAS** é uma iniciativa acadêmica desenvolvida no âmbito da Bioinformática.
 
 - **Coordenador do Projeto:** Prof. Dr. Fabiano B. Menegidio
-- **Laboratório:** [LaBiOmicS](https://github.com/LaBiOmicS) - Laboratório de Bioinformática e Ciências Ômicas
+- **Laboratório:** [LaBiOmics](https://github.com/LaBiOmicS) - Laboratório de Bioinformática e Ciências Ômicas
 - **Instituição:** Universidade de Mogi das Cruzes (UMC)
+
+---
+
+## 📝 Citação
+
+Se você utilizar o **ARAMAS** em seu trabalho acadêmico ou pedagógico, por favor, cite-o utilizando o DOI do Zenodo:
+
+> Menegidio, F. B. (2026). ARAMAS: Ambiente Remoto para o Aprendizado e Manipulação de Arquivos e Sistemas (v1.0.2). Zenodo. https://doi.org/10.5281/zenodo.14925829
 
 ---
 
