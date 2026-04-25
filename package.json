@@ -33,6 +33,9 @@
   ],
   "author": "Fabiano B. Menegidio",
   "license": "MIT",
+  "engines": {
+    "node": ">=22.22.2"
+  },
   "bugs": {
     "url": "https://github.com/LaBiOmicS/aramas/issues"
   },
