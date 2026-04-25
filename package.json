@@ -1,8 +1,28 @@
 {
   "name": "aramas",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Ambiente Remoto para o Aprendizado e Manipulação de Arquivos e Sistemas - A gamified educational platform for learning Linux and Bioinformatics.",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LaBiOmicS/aramas.git"
+  },
+  "keywords": [
+    "linux",
+    "bioinformatics",
+    "gamification",
+    "education",
+    "terminal",
+    "xtermjs",
+    "react"
+  ],
+  "author": "Fabiano B. Menegidio",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LaBiOmicS/aramas/issues"
+  },
+  "homepage": "https://labiomics.github.io/aramas/",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

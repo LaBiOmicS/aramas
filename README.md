@@ -4,8 +4,24 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-v22.22.2-green.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![GitHub issues](https://img.shields.io/github/issues/LaBiOmicS/aramas)](https://github.com/LaBiOmicS/aramas/issues)
+[![GitHub stars](https://img.shields.io/github/stars/LaBiOmicS/aramas)](https://github.com/LaBiOmicS/aramas/stargazers)
 
 O **ARAMAS** é uma plataforma educacional imersiva e gamificada projetada para o ensino de **Linux** e **Bioinformática**. Ele oferece um ambiente de terminal simulado onde estudantes podem praticar comandos reais, gerenciar sistemas de arquivos e executar pipelines de análise genômica em uma jornada baseada em missões, XP e progressão de ranks.
+
+---
+
+## 📋 Sumário
+- [🚀 Demonstração Online](#-demonstração-online)
+- [🧬 Principais Funcionalidades](#-principais-funcionalidades)
+- [📚 Estrutura Educacional](#-estrutura-educacional-módulos)
+- [🛠️ Tecnologias Utilizadas](#-tecnologias-utilizadas)
+- [📂 Estrutura do Projeto](#-estrutura-do-projeto)
+- [⚙️ Desenvolvimento e Instalação](#-desenvolvimento-e-instalação-local)
+- [🤝 Contribuição](#-contribuição)
+- [👤 Coordenação e Créditos](#-coordenação-e-créditos)
+- [📄 Licença](#-licença)
 
 ---
 
@@ -52,6 +68,27 @@ Acesse a plataforma agora: [https://labiomics.github.io/aramas/](https://labiomi
 
 ---
 
+## 📂 Estrutura do Projeto
+
+```text
+gamified-terminal/
+├── .github/              # Configurações do GitHub (workflows, templates)
+├── public/               # Ativos estáticos públicos
+├── src/
+│   ├── assets/           # Imagens e recursos visuais
+│   ├── components/       # Componentes React (Terminal, UI)
+│   ├── terminal/
+│   │   ├── commands/     # Implementação dos comandos (Bash, Bioinfo, etc)
+│   │   ├── engine/       # Lógica central (QuestManager, TerminalEngine)
+│   │   └── vfs/          # Virtual File System (Gerenciamento de arquivos)
+│   ├── App.tsx           # Componente principal
+│   └── main.tsx          # Ponto de entrada
+├── index.html            # Template HTML
+└── package.json          # Dependências e scripts
+```
+
+---
+
 ## ⚙️ Desenvolvimento e Instalação Local
 
 ### Pré-requisitos
@@ -76,6 +113,12 @@ Acesse a plataforma agora: [https://labiomics.github.io/aramas/](https://labiomi
     ```bash
     npm run build
     ```
+
+---
+
+## 🤝 Contribuição
+
+Contribuições são muito bem-vindas! Se você tem uma ideia de nova missão, novo comando ou encontrou um bug, por favor, leia nosso [Guia de Contribuição](CONTRIBUTING.md) antes de enviar um Pull Request.
 
 ---
 
