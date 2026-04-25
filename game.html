@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARAMAS Retro Emulator</title>
+    <style type="text/css">
+      body, html { 
+        margin: 0; 
+        padding: 0; 
+        width: 100%; 
+        height: 100%; 
+        overflow: hidden; 
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #dosbox { 
+        width: 100%; 
+        height: 100%; 
+      }
+      .loading {
+        color: #0dbc79;
+        font-family: monospace;
+        position: absolute;
+        text-align: center;
+        z-index: 10;
+      }
+      /* Ensure the dosbox canvas fits correctly */
+      canvas {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="dosbox"></div>
+    <div id="status" class="loading">
+      [ CARREGANDO SIMULADOR ]<br>
+      <small>Pressione qualquer tecla para interagir se necessário</small>
+    </div>
+
+    <script type="text/javascript" src="https://js-dos.com/cdn/js-dos-api.js"></script>
+    <script type="text/javascript">
+      var params = new URLSearchParams(window.location.search);
+      var game = params.get("game");
+      var status = document.getElementById("status");
+
+      var games = {
+        "doom": {
+          zip: "https://js-dos.com/cdn/upload/DOOM.zip",
+          exe: "./DOOM.EXE"
+        },
+        "duke": {
+          zip: "https://js-dos.com/cdn/upload/DUKE3D.zip",
+          exe: "./DUKE3D.EXE"
+        }
+      };
+
+      if (games[game]) {
+        var dosbox = new Dosbox({
+          id: "dosbox",
+          onload: function (dosbox) {
+            status.style.display = "none";
+            dosbox.run(games[game].zip, games[game].exe);
+          },
+          onrun: function (dosbox, app) {
+            console.log("Simulador iniciado: " + app);
+          }
+        });
+      } else {
+        status.innerHTML = "<span style='color: #ff4d4d'>ERRO: JOGO NÃO ENCONTRADO</span>";
+      }
+    </script>
+  </body>
+</html>
