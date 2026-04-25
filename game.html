@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="pt-br">
+<html lang="en-us">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>ARAMAS Retro Emulator</title>
     <style type="text/css">
       body, html { 
@@ -12,106 +12,63 @@
         height: 100%; 
         overflow: hidden; 
         background: #000;
-        color: #0dbc79;
-        font-family: monospace;
       }
       #dosbox { 
         width: 100%; 
         height: 100%; 
       }
+      /* Ajuste para o canvas do js-dos preencher o container */
+      .dosbox-container { width: 100%; height: 100%; }
+      canvas { width: 100% !important; height: 100% !important; object-fit: contain; }
+      
       .loading {
+        color: #0dbc79;
+        font-family: monospace;
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         text-align: center;
         z-index: 10;
-        background: rgba(0,0,0,0.9);
-        padding: 20px;
-        border: 1px solid #0dbc79;
-        min-width: 250px;
-      }
-      #dosbox canvas {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: contain;
       }
     </style>
   </head>
   <body>
     <div id="dosbox"></div>
     <div id="status" class="loading">
-      [ INICIALIZANDO SIMULADOR ]<br>
-      <span id="detail">Carregando scripts...</span>
+      [ INICIALIZANDO SIMULADOR ]
     </div>
-
+    
     <script type="text/javascript" src="https://js-dos.com/cdn/js-dos-api.js"></script>
     <script type="text/javascript">
       var params = new URLSearchParams(window.location.search);
-      var gameKey = params.get("game");
+      var game = params.get("game");
       var status = document.getElementById("status");
-      var detail = document.getElementById("detail");
 
       var games = {
         "doom": {
-          url: "https://js-dos.com/cdn/upload/DOOM-@evilution.zip",
-          exe: "./DOOM.EXE"
+          zip: "https://js-dos.com/cdn/upload/DOOM-@evilution.zip",
+          exe: "./doom"
         },
         "duke": {
-          url: "https://js-dos.com/cdn/upload/DUKE3D.zip",
-          exe: "./DUKE3D.EXE"
+          zip: "https://js-dos.com/cdn/upload/DUKE3D.zip",
+          exe: "./duke3d"
         }
       };
 
-      function start() {
-        if (!games[gameKey]) {
-          status.innerHTML = "<span style='color: #ff4d4d'>ERRO: JOGO NÃO ENCONTRADO</span>";
-          return;
-        }
-
-        detail.innerText = "Baixando arquivos do jogo...";
-
-        try {
-          // A API legada muitas vezes precisa saber onde está o wdosbox.js
-          var dosbox = new Dosbox({
-            id: "dosbox",
-            wdosboxUrl: "https://js-dos.com/cdn/wdosbox.js",
-            onload: function (dosbox) {
-              detail.innerText = "Extraindo e iniciando...";
-              // Algumas versões da API legada escondem o status automaticamente,
-              // outras não. Vamos garantir.
-              setTimeout(function() {
-                status.style.display = "none";
-              }, 2000);
-              dosbox.run(games[gameKey].url, games[gameKey].exe);
-            },
-            onrun: function (dosbox, app) {
-              status.style.display = "none";
-              console.log("Simulador iniciado: " + app);
-            },
-            onerror: function (err) {
-              status.innerHTML = "<span style='color: #ff4d4d'>ERRO NO EMULADOR: " + err + "</span>";
-            }
-          });
-        } catch (e) {
-          status.innerHTML = "<span style='color: #ff4d4d'>ERRO DE EXECUÇÃO: " + e.message + "</span>";
-        }
-      }
-
-      if (typeof Dosbox !== 'undefined') {
-        start();
-      } else {
-        var checkApi = setInterval(function() {
-          if (typeof Dosbox !== 'undefined') {
-            clearInterval(checkApi);
-            start();
+      if (games[game]) {
+        var dosbox = new Dosbox({
+          id: "dosbox",
+          onload: function (dosbox) {
+            status.style.display = "none";
+            dosbox.run(games[game].zip, games[game].exe);
+          },
+          onrun: function (dosbox, app) {
+            console.log("App '" + app + "' is running");
           }
-        }, 100);
-        
-        window.onload = function() {
-          clearInterval(checkApi);
-          start();
-        };
+        });
+      } else {
+        status.innerHTML = "<span style='color: #ff4d4d'>ERRO: JOGO NÃO ENCONTRADO</span>";
       }
     </script>
   </body>
