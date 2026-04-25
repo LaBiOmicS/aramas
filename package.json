@@ -42,7 +42,9 @@
   "homepage": "https://labiomics.github.io/aramas/",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run build:app && npm run build:lib",
+    "build:app": "tsc -b && vite build",
+    "build:lib": "vite build --config vite.library.config.ts",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
