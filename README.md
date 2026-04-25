@@ -19,6 +19,12 @@ O **ARAMAS** é uma plataforma educacional imersiva e gamificada projetada para 
 
 ---
 
+<p align="center">
+  <img src="infografico.png" alt="metaLncRNA Infographic" width="100%">
+</p>
+
+---
+
 ## 📋 Sumário
 - [🚀 Demonstração Online](#-demonstração-online)
 - [🧬 Principais Funcionalidades](#-principais-funcionalidades)
