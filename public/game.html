@@ -27,7 +27,6 @@
         text-align: center;
         z-index: 10;
       }
-      /* Ensure the dosbox canvas fits correctly */
       canvas {
         width: 100% !important;
         height: 100% !important;
@@ -42,7 +41,8 @@
       <small>Pressione qualquer tecla para interagir se necessário</small>
     </div>
 
-    <script type="text/javascript" src="https://js-dos.com/cdn/js-dos-api.js"></script>
+    <!-- Usando a versão estável 6.22 do js-dos -->
+    <script type="text/javascript" src="https://js-dos.com/6.22/current/js-dos.js"></script>
     <script type="text/javascript">
       var params = new URLSearchParams(window.location.search);
       var game = params.get("game");
@@ -50,25 +50,29 @@
 
       var games = {
         "doom": {
-          zip: "https://js-dos.com/cdn/upload/DOOM.zip",
-          exe: "./DOOM.EXE"
+          zip: "https://js-dos.com/cdn/upload/DOOM-@evilution.zip",
+          exe: "DOOM.EXE",
+          dir: "DOOM"
         },
         "duke": {
           zip: "https://js-dos.com/cdn/upload/DUKE3D.zip",
-          exe: "./DUKE3D.EXE"
+          exe: "DUKE3D.EXE",
+          dir: "DUKE3D"
         }
       };
 
       if (games[game]) {
-        var dosbox = new Dosbox({
-          id: "dosbox",
-          onload: function (dosbox) {
+        Dos(document.getElementById("dosbox"), {
+          wdosboxUrl: "https://js-dos.com/6.22/current/wdosbox.js"
+        }).ready(function (fs, main) {
+          fs.extract(games[game].zip).then(function () {
             status.style.display = "none";
-            dosbox.run(games[game].zip, games[game].exe);
-          },
-          onrun: function (dosbox, app) {
-            console.log("Simulador iniciado: " + app);
-          }
+            // Executa o comando para entrar na pasta e rodar o executável
+            main(["-c", "cd " + games[game].dir, "-c", games[game].exe]).then(function (ci) {
+              console.log("Simulador iniciado com sucesso.");
+              window.ci = ci;
+            });
+          });
         });
       } else {
         status.innerHTML = "<span style='color: #ff4d4d'>ERRO: JOGO NÃO ENCONTRADO</span>";
